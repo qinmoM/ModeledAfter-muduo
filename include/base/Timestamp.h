@@ -18,7 +18,7 @@ namespace qinmo
         Timestamp();
         /// @brief construct with specific time
         /// @param microsecondsSinceEpoch the number of microseconds since the beginning of the epoch
-        Timestamp(micro microsecondsSinceEpoch);
+        explicit Timestamp(micro microsecondsSinceEpoch);
 
     public:
         /// @brief get time by long long type
