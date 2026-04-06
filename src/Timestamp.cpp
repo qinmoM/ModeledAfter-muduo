@@ -1,7 +1,6 @@
 #include "../include/base/Timestamp.h"
 
 #include <ctime>
-#include <inttypes.h>
 
 qinmo::Timestamp::Timestamp() : microsecond_(0) {}
 
@@ -47,7 +46,7 @@ std::string qinmo::Timestamp::toStringMicroseconds(bool local) const
     int len = std::strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", &tm);
 
     if (0 == len) return "";
-    len += std::snprintf(buf + len, sizeof(buf) - len, ".%06" PRId64, getMicroseconds() % MicToSec);
+    len += std::snprintf(buf + len, sizeof(buf) - len, ".%06lld", getMicroseconds() % MicToSec);
 
     return std::string(buf, len);
 }
@@ -58,12 +57,12 @@ qinmo::Timestamp qinmo::Timestamp::now()
         std::chrono::system_clock::now().time_since_epoch()).count());
 }
 
-bool operator<(const qinmo::Timestamp &a, const qinmo::Timestamp &b)
+bool qinmo::operator<(const qinmo::Timestamp &a, const qinmo::Timestamp &b)
 {
     return a.getMicroseconds() < b.getMicroseconds();
 }
 
-bool operator==(const qinmo::Timestamp &a, const qinmo::Timestamp &b)
+bool qinmo::operator==(const qinmo::Timestamp &a, const qinmo::Timestamp &b)
 {
     return a.getMicroseconds() == b.getMicroseconds();
 }

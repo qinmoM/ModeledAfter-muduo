@@ -41,4 +41,7 @@ namespace qinmo
     private:
         micro microsecond_;
     };
+
+    bool operator<(const qinmo::Timestamp &a, const qinmo::Timestamp &b);
+    bool operator==(const qinmo::Timestamp &a, const qinmo::Timestamp &b);
 }
