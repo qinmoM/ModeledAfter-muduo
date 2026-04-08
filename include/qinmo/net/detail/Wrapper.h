@@ -1,0 +1,59 @@
+#pragma once
+
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <endian.h>
+#include <stdint.h>
+
+/// @namespace qinmo
+namespace qinmo
+{
+/// @namespace qinmp::net
+namespace net
+{
+/// @namespace qinmo::net::detail
+/// @warning For internal use only, do NOT use from outside the library 
+namespace detail
+{
+
+using sockaddr = struct ::sockaddr;
+using sockaddr_in = struct ::sockaddr_in;
+using sockaddr_in6 = struct ::sockaddr_in6;
+
+template <typename from, typename to>
+to* sockaddr_cast(from* t)
+{
+    static_assert(false, "sockaddr_cast : ");
+    return nullptr;
+}
+template <>
+const sockaddr* sockaddr_cast(const sockaddr_in* addr) { return static_cast<const sockaddr*>(static_cast<const void*>(addr)); }
+template <>
+const sockaddr* sockaddr_cast(const sockaddr_in6* addr) { return static_cast<const sockaddr*>(static_cast<const void*>(addr)); }
+template <>
+sockaddr* sockaddr_cast(sockaddr_in* addr) { return static_cast<sockaddr*>(static_cast<void*>(addr)); }
+template <>
+sockaddr* sockaddr_cast(sockaddr_in6* addr) { return static_cast<sockaddr*>(static_cast<void*>(addr)); }
+template <>
+const sockaddr_in* sockaddr_cast(const sockaddr* addr) { return static_cast<const sockaddr_in*>(static_cast<const void*>(addr)); }
+template <>
+const sockaddr_in6* sockaddr_cast(const sockaddr* addr) { return static_cast<const sockaddr_in6*>(static_cast<const void*>(addr)); }
+template <>
+sockaddr_in* sockaddr_cast(sockaddr* addr) { return static_cast<sockaddr_in*>(static_cast<void*>(addr)); }
+template <>
+sockaddr_in6* sockaddr_cast(sockaddr* addr) { return static_cast<sockaddr_in6*>(static_cast<void*>(addr)); }
+
+inline uint16_t netToHost16(uint16_t net);
+inline uint32_t netToHost32(uint32_t net);
+inline uint64_t netToHost64(uint64_t net);
+
+inline uint16_t hostToNet16(uint16_t net);
+inline uint32_t hostToNet32(uint32_t net);
+inline uint64_t hostToNet64(uint64_t net);
+
+// int portReuse(int fd);
+// int close(int fd);
+
+} // namespace detail
+} // namespace net
+} // namespace qinmo
