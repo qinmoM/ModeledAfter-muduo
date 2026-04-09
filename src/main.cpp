@@ -1,5 +1,6 @@
 #include "qinmo/base/Timestamp.h"
 #include "qinmo/net/detail/Wrapper.h"
+#include "qinmo/base/StringView.h"
 #include <iostream>
 
 using qinmo::Timestamp;
@@ -24,6 +25,11 @@ int main()
     // qinmo::net::detail::sockaddr_cast<int>(1);
     qinmo::net::detail::sockaddr_cast<sockaddr_in, sockaddr>(nullptr);
 
+    // StringView
+    strlen("000");
+    // strlen(nullptr);
+    qinmo::StringView s("0000");
+    std::cout << s[3] << std::endl;
     return 0;
 }
 
