@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../../base/StringView.h"
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <endian.h>
@@ -51,8 +52,19 @@ inline uint16_t hostToNet16(uint16_t net);
 inline uint32_t hostToNet32(uint32_t net);
 inline uint64_t hostToNet64(uint64_t net);
 
-// int portReuse(int fd);
-// int close(int fd);
+void zeroMemory(void* buf, size_t len);
+
+bool pton4(StringView cp, in_addr& buf);
+bool pton6(StringView cp, in6_addr& buf);
+std::string ntop4(const in_addr& addr);
+std::string ntop6(const in6_addr& addr);
+
+int close(int fd);
+int portReuse(int sockfd);
+ssize_t send(int sockfd, void* buf, size_t count);
+ssize_t recv(int sockfd, void* buf, size_t count);
+ssize_t sendto(int sockfd, void* buf, size_t count, const sockaddr& addr);
+ssize_t recvfrom(int sockfd, void* buf, size_t count, const sockaddr& addr);
 
 } // namespace detail
 } // namespace net
