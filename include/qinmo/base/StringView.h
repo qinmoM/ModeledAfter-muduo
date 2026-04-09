@@ -1,3 +1,7 @@
+/**
+ * @brief string view class
+ */
+
 #pragma once
 
 #include <string>
@@ -7,15 +11,14 @@
 namespace qinmo
 {
 
+/// @brief string view class for fast string access
+/// @note the origin string must not be freed during the lifetime of the view
 class StringView
 {
 public:
+    /// @note Ensure len <= string length
     StringView() : ptr_(nullptr), len_(0) { }
     StringView(const char* ptr, uint32_t len) : ptr_(ptr), len_(len) { }
-    StringView(const std::string& string)
-        : ptr_(string.c_str())
-        , len_(string.size())
-    { }
     StringView(const char* ptr)
         : ptr_(ptr)
         , len_(static_cast<uint32_t>((nullptr == ptr ? 0 : ::strlen(ptr))))
@@ -28,8 +31,13 @@ public:
         : ptr_(static_cast<const char*>(static_cast<const void*>(ptr)))
         , len_(len)
     { }
+    StringView(const std::string& string)
+        : ptr_(string.c_str())
+        , len_(string.size())
+    { }
 
 public:
+    /// @note Interface same as standerd library.
     const char* data() const { return ptr_; }
     uint32_t size() const { return len_; }
     bool empty() const { return !len_; }
@@ -37,6 +45,7 @@ public:
     void set(const char* ptr, int len) { ptr_ = ptr; len_ = len; }
     void clear() { ptr_ = nullptr; len_ = 0; }
 
+    /// @brief construct a string
     std::string to_string() const { return std::string(ptr_, len_); }
 
     const char& operator[](uint32_t index) const { return *(ptr_ + index); }
