@@ -12,8 +12,10 @@
 #include <netinet/in.h>
 #include <strings.h>
 
+/// @namespace qinmo
 namespace qinmo
 {
+/// @namespace qinmp::net
 namespace net
 {
 
