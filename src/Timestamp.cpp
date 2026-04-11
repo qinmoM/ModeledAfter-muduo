@@ -2,23 +2,26 @@
 
 #include <ctime>
 
-qinmo::Timestamp::Timestamp() : microsecond_(0) {}
+namespace qinmo
+{
 
-qinmo::Timestamp::Timestamp(qinmo::Timestamp::micro microsecondsSinceEpoch)
+Timestamp::Timestamp() : microsecond_(0) {}
+
+Timestamp::Timestamp(Timestamp::micro microsecondsSinceEpoch)
     : microsecond_(microsecondsSinceEpoch)
 { }
 
-qinmo::Timestamp::micro qinmo::Timestamp::getMicroseconds() const
+Timestamp::micro Timestamp::getMicroseconds() const
 {
     return microsecond_;
 }
 
-qinmo::Timestamp::micro qinmo::Timestamp::getSeconds() const
+Timestamp::micro Timestamp::getSeconds() const
 {
     return microsecond_ / MicToSec;
 }
 
-std::string qinmo::Timestamp::toString(bool local) const
+std::string Timestamp::toString(bool local) const
 {
     time_t t = getSeconds();
     std::tm tm;
@@ -33,7 +36,7 @@ std::string qinmo::Timestamp::toString(bool local) const
     return std::string(buf, len);
 }
 
-std::string qinmo::Timestamp::toStringMicroseconds(bool local) const
+std::string Timestamp::toStringMicroseconds(bool local) const
 {
     time_t t = getSeconds();
     std::tm tm;
@@ -51,18 +54,20 @@ std::string qinmo::Timestamp::toStringMicroseconds(bool local) const
     return std::string(buf, len);
 }
 
-qinmo::Timestamp qinmo::Timestamp::now()
+Timestamp Timestamp::now()
 {
     return Timestamp(std::chrono::duration_cast<std::chrono::microseconds>(
         std::chrono::system_clock::now().time_since_epoch()).count());
 }
 
-bool qinmo::operator<(const qinmo::Timestamp &a, const qinmo::Timestamp &b)
+bool operator<(const Timestamp &a, const Timestamp &b)
 {
     return a.getMicroseconds() < b.getMicroseconds();
 }
 
-bool qinmo::operator==(const qinmo::Timestamp &a, const qinmo::Timestamp &b)
+bool operator==(const Timestamp &a, const Timestamp &b)
 {
     return a.getMicroseconds() == b.getMicroseconds();
 }
+
+} // namespace qinmo
