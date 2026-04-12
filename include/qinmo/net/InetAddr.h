@@ -1,7 +1,5 @@
 /**
  * @brief network address class
- * 
- * This is an internal header file, you should not include this.
  */
 
 #pragma once
@@ -34,8 +32,10 @@ public:
     /// @brief get port
     /// @return network order
     uint16_t getPort() const;
-    /// @brief get address
-    const sockaddr* getSockaddr() const;
+    /// @brief get IP address
+    std::string getIP() const;
+    /// @brief get sockaddr
+    const sockaddr& getSockaddr() const;
 
     /// @brief set the IP address
     /// @param str dotted decimal notation

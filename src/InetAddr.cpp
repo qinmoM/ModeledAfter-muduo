@@ -31,12 +31,20 @@ uint16_t InetAddr::getPort() const
         return detail::netToHost16(addr_.addr6_.sin6_port);
 }
 
-const sockaddr* InetAddr::getSockaddr() const
+std::string InetAddr::getIP() const
 {
     if (isIPv4())
-        return detail::sockaddr_cast<const sockaddr_in, const sockaddr>(&(addr_.addr4_));
+        return detail::ntop4(addr_.addr4_.sin_addr);
     else
-        return detail::sockaddr_cast<const sockaddr_in6, const sockaddr>(&(addr_.addr6_));
+        return detail::ntop6(addr_.addr6_.sin6_addr);
+}
+
+const sockaddr& InetAddr::getSockaddr() const
+{
+    if (isIPv4())
+        return *detail::sockaddr_cast<const sockaddr_in, const sockaddr>(&(addr_.addr4_));
+    else
+        return *detail::sockaddr_cast<const sockaddr_in6, const sockaddr>(&(addr_.addr6_));
 }
 
 bool InetAddr::setIP(const StringView& str)
