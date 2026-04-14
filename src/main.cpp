@@ -2,8 +2,7 @@
 #include "qinmo/net/detail/Wrapper.h"
 #include "qinmo/base/StringView.h"
 #include "qinmo/net/SocketTCP.h"
-#include "qinmo/base/StringSplice.h"
-#include <iostream>
+#include "qinmo/base/StringConcat.h"
 
 using qinmo::Timestamp;
 
@@ -33,8 +32,10 @@ int main()
     qinmo::StringView s("0000");
     std::cout << s[3] << std::endl;
 
-    // StringSplice
-    std::cout << qinmo::stringSplice("asd", 9, '0', "asd") << "\n";
+    // String concat
+    int test = 0;
+    std::cout << qinmo::concat("asd", 9, '0', "asd") << "\n";
+    qinmo::print(test, "hello", "world", 10, '8', 7.9, '\n');
 
     // SockTCP
     // qinmo::net::InetAddr addr;
