@@ -1,6 +1,8 @@
 #include "qinmo/base/Timestamp.h"
 #include "qinmo/net/detail/Wrapper.h"
 #include "qinmo/base/StringView.h"
+#include "qinmo/net/SocketTCP.h"
+#include "qinmo/base/StringSplice.h"
 #include <iostream>
 
 using qinmo::Timestamp;
@@ -30,6 +32,16 @@ int main()
     // strlen(nullptr);
     qinmo::StringView s("0000");
     std::cout << s[3] << std::endl;
+
+    // StringSplice
+    std::cout << qinmo::stringSplice("asd", 9, '0', "asd") << "\n";
+
+    // SockTCP
+    // qinmo::net::InetAddr addr;
+    // addr.setIP("xxx.xxx.xxx.xxx");
+    // addr.setPort(0);
+    // qinmo::net::SocketTCP sockfd = qinmo::net::SocketTCP::create(addr);
+    // sockfd.bind(addr);
     return 0;
 }
 
