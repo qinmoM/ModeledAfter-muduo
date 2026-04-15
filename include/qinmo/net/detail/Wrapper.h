@@ -34,7 +34,7 @@ using sockaddr_in6 = struct ::sockaddr_in6;
 template <typename from, typename to>
 to* sockaddr_cast(from* t)
 {
-    static_assert(false, "sockaddr_cast : ");
+    static_assert(false, "sockaddr_cast : unspecialized types.");
     return nullptr;
 }
 /// @details template specialization
@@ -84,8 +84,10 @@ bool pton6(StringView cp, in6_addr& addr);
 std::string ntop4(const in_addr& addr);
 std::string ntop6(const in6_addr& addr);
 
+int socket(int af, int type, int protocol = 0);
 int close(int fd);
 int portReuse(int sockfd);
+int bind(int sockfd, const sockaddr& addr);
 ssize_t send(int sockfd, void* buf, size_t count);
 ssize_t recv(int sockfd, void* buf, size_t count);
 ssize_t sendto(int sockfd, void* buf, size_t count, const sockaddr& addr);
