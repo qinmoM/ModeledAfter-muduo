@@ -6,8 +6,8 @@ namespace qinmo
 /// @namespace qinmo::net
 namespace net
 {
-/// @namespace qinmo::net::poll
-namespace poll
+/// @namespace qinmo::net::poller
+namespace poller
 {
 
 EpollPoller::EpollPoller(EventLoop* eventLoop)
@@ -73,6 +73,6 @@ void EpollPoller::epollCTL(int op, Channel& channel)
     ::epoll_ctl(epollfd_, op, channel.fd(), &event);
 }
 
-}
-}
-}
+} // namespace poller
+} // namespace net
+} // namespace qinmo

@@ -7,8 +7,8 @@ namespace qinmo
 /// @namespace qinmo::net
 namespace net
 {
-/// @namespace qinmo::net::poll
-namespace poll
+/// @namespace qinmo::net::poller
+namespace poller
 {
 
 class EpollPoller : public Poller
@@ -34,6 +34,6 @@ private:
     std::vector<epoll_event> eventsbuf_;
 
 };
-}
-}
-}
+} // namespace poller
+} // namespace net
+} // namespace qinmo
