@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Channel.h"
-#include <memory>
 
 namespace qinmo
 {
@@ -36,7 +35,7 @@ public:
 public:
     /// @brief event loop
     /// @param timeoutMs time-out (milliseconds)
-    /// @param list return the triggered event
+    /// @param list return the triggered event (append it to end of list when list is non-empty)
     /// @return current timestamp
     virtual Timestamp poll(int timeoutMs, ChannelList& list) = 0;
 
