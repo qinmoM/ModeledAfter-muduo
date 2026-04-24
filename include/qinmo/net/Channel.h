@@ -14,6 +14,8 @@ namespace qinmo
 namespace net
 {
 
+using ChannelList = std::vector<Channel*>;
+
 class Channel
 {
 public:

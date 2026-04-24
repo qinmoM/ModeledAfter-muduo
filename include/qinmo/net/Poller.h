@@ -19,9 +19,6 @@ class EventLoop;
 class Poller
 {
 public:
-    using ChannelList = std::vector<Channel*>;
-
-public:
     /// @brief get instance of Poller subclass (automatically determined at compile-time)
     /// @return unique pointer of Poller subclass
     static std::unique_ptr<Poller> create(EventLoop* eventLoop);
