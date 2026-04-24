@@ -29,6 +29,9 @@ public:
 
     virtual ~Poller() = default;
 
+    Poller(const Poller&) = delete;
+    Poller& operator()(const Poller&) = delete;
+
 public:
     /// @brief event loop
     /// @param timeoutMs time-out (milliseconds)
