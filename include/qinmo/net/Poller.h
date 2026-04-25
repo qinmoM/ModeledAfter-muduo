@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Channel.h"
+#include <unordered_map>
 
 namespace qinmo
 {
