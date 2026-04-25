@@ -7,10 +7,12 @@
 #pragma once
 
 #include "../../base/StringView.h"
+#include <sys/eventfd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <endian.h>
 #include <stdint.h>
+#include <unistd.h>
 
 /// @namespace qinmo
 namespace qinmo
@@ -92,6 +94,11 @@ ssize_t send(int sockfd, void* buf, size_t count);
 ssize_t recv(int sockfd, void* buf, size_t count);
 ssize_t sendto(int sockfd, void* buf, size_t count, const sockaddr& addr);
 ssize_t recvfrom(int sockfd, void* buf, size_t count, const sockaddr& addr);
+
+ssize_t read(int fd, void* ptr, size_t count);
+ssize_t write(int fd, void* ptr, size_t count);
+
+int eventfd(unsigned int initval, int flags);
 
 } // namespace detail
 } // namespace net
