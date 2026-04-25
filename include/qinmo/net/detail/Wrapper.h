@@ -6,13 +6,13 @@
 
 #pragma once
 
+#include "qinmo/base/detail/Common.h"
 #include "../../base/StringView.h"
 #include <sys/eventfd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <endian.h>
 #include <stdint.h>
-#include <unistd.h>
 
 /// @namespace qinmo
 namespace qinmo
