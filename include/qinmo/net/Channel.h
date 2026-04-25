@@ -5,6 +5,7 @@
 #include <functional>
 #include <atomic>
 #include <memory>
+#include <vector>
 
 class EventLoop;
 
@@ -25,7 +26,7 @@ public:
     using TimeEventCallback = std::function<void(qinmo::Timestamp)>;
 
 public:
-    Channel(EventLoop* eventLoop);
+    Channel(EventLoop* eventLoop, int fd);
 
     Channel(const Channel&) = delete;
     Channel& operator()(const Channel&) = delete;

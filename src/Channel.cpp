@@ -7,8 +7,9 @@ namespace qinmo
 namespace net
 {
 
-Channel::Channel(EventLoop* eventLoop)
+Channel::Channel(EventLoop* eventLoop, int fd)
     : loop_(eventLoop)
+    , fd_(fd)
 { }
 
 int Channel::fd() const
