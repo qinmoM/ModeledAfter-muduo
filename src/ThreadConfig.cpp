@@ -8,7 +8,7 @@ namespace detail
 
 thread_local ThreadType cached_thread_id = threadTypeEmpty;
 
-ThreadType get_tid()
+ThreadType getTid()
 {
     if (threadTypeEmpty == cached_thread_id)
         cached_thread_id = tid();

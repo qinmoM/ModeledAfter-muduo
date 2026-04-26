@@ -10,6 +10,7 @@ namespace net
 Channel::Channel(EventLoop* eventLoop, int fd)
     : loop_(eventLoop)
     , fd_(fd)
+    , isInLoop_(false)
 { }
 
 int Channel::fd() const

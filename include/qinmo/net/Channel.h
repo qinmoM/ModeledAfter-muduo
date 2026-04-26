@@ -17,6 +17,10 @@ namespace net
 
 using ChannelList = std::vector<Channel*>;
 
+/**
+ * @brief file descriptor and event encapsulation class
+ * @note only used to observing file descriptor, do not auto release
+ */
 class Channel
 {
 public:
@@ -76,7 +80,7 @@ private:
 
 private:
     EventLoop* loop_;
-    std::atomic<bool> isInLoop_{false};
+    std::atomic<bool> isInLoop_;
 
     // std::weak_ptr<void> tie_;
 
