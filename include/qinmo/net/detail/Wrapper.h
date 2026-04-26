@@ -8,9 +8,9 @@
 
 #include "qinmo/base/detail/Common.h"
 #include "../../base/StringView.h"
-#include <sys/eventfd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <arpa/inet.h>
 #include <endian.h>
 #include <stdint.h>
 
@@ -59,46 +59,40 @@ sockaddr_in6* sockaddr_cast(sockaddr* addr) { return static_cast<sockaddr_in6*>(
 
 /// @brief network to host byte order, supporting 16-bit, 32-bit and 64-bit unsigned intergers
 /// @param net network order
-inline uint16_t netToHost16(uint16_t net);
-inline uint32_t netToHost32(uint32_t net);
-inline uint64_t netToHost64(uint64_t net);
+inline uint16_t netToHost16(uint16_t net) { return be16toh(net); }
+inline uint32_t netToHost32(uint32_t net) { return be32toh(net); }
+inline uint64_t netToHost64(uint64_t net) { return be64toh(net); }
 
 /// @brief host to network byte order, supporting 16-bit, 32-bit and 64-bit unsigned intergers
 /// @param host host order
-inline uint16_t hostToNet16(uint16_t host);
-inline uint32_t hostToNet32(uint32_t host);
-inline uint64_t hostToNet64(uint64_t host);
+inline uint16_t hostToNet16(uint16_t host) { return htobe16(host); }
+inline uint32_t hostToNet32(uint32_t host) { return htobe32(host); }
+inline uint64_t hostToNet64(uint64_t host) { return htobe64(host); }
 
 /// @brief initialize this memory block to zero
 /// @param buf pointer
 /// @param len length
-void zeroMemory(void* buf, size_t len);
+inline void zeroMemory(void* buf, size_t len) { bzero(buf, len); }
 
 /// @brief convert dotted decimal to network byte order
 /// @param cp dotted decimal string
 /// @param addr net address
 /// @return return true when successful, otherwise false
-bool pton4(StringView cp, in_addr& addr);
-bool pton6(StringView cp, in6_addr& addr);
+inline bool pton4(StringView cp, in_addr& addr) { return 1 == ::inet_pton(AF_INET, cp.data(), &addr); }
+inline bool pton6(StringView cp, in6_addr& addr) { return 1 == ::inet_pton(AF_INET6, cp.data(), &addr); }
 /// @brief convert network byte order to dotted decimal
 /// @param addr net address
 /// @return return dotted decimal string
-std::string ntop4(const in_addr& addr);
-std::string ntop6(const in6_addr& addr);
+inline std::string ntop4(const in_addr& addr) { char buf[INET_ADDRSTRLEN]; return ::inet_ntop(AF_INET, &addr, buf, sizeof(buf)); }
+inline std::string ntop6(const in6_addr& addr) { char buf[INET6_ADDRSTRLEN]; return ::inet_ntop(AF_INET6, &addr, buf, sizeof(buf)); }
 
-int socket(int af, int type, int protocol = 0);
-int close(int fd);
-int portReuse(int sockfd);
-int bind(int sockfd, const sockaddr& addr);
-ssize_t send(int sockfd, void* buf, size_t count);
-ssize_t recv(int sockfd, void* buf, size_t count);
-ssize_t sendto(int sockfd, void* buf, size_t count, const sockaddr& addr);
-ssize_t recvfrom(int sockfd, void* buf, size_t count, const sockaddr& addr);
-
-ssize_t read(int fd, void* ptr, size_t count);
-ssize_t write(int fd, void* ptr, size_t count);
-
-int eventfd(unsigned int initval, int flags);
+inline int socket(int af, int type, int protocol = 0) { return ::socket(af, type, protocol); }
+inline bool portReuse(int sockfd) { int opt = 1; return 0 == ::setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)); }
+inline bool bind(int sockfd, const sockaddr& addr) { return 0 == ::bind(sockfd, &addr, sizeof(sockaddr)); }
+inline ssize_t send(int sockfd, void* buf, size_t count) { return ::send(sockfd, buf, count, 0); }
+inline ssize_t recv(int sockfd, void* buf, size_t count) { return ::recv(sockfd, buf, count, 0); }
+inline ssize_t sendto(int sockfd, void* buf, size_t count, const sockaddr& addr) { return ::sendto(sockfd, buf, count, 0, &addr, sizeof(sockaddr)); }
+inline ssize_t recvfrom(int sockfd, void* buf, size_t count, sockaddr& addr, unsigned int& len) { return ::recvfrom(sockfd, buf, count, 0, &addr, &len); }
 
 } // namespace detail
 } // namespace net

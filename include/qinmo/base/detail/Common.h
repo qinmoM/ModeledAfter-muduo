@@ -12,31 +12,19 @@ namespace qinmo
 namespace detail
 {
 
-inline ssize_t read(int fd, void* ptr, size_t count)
-{
-    return ::read(fd, ptr, count);
-}
-
-inline ssize_t write(int fd, void* ptr, size_t count)
-{
-    return ::write(fd, ptr, count);
-}
+inline int close(int fd) { return ::close(fd); }
+inline ssize_t read(int fd, void* ptr, size_t count) { return ::read(fd, ptr, count); }
+inline ssize_t write(int fd, void* ptr, size_t count) { return ::write(fd, ptr, count); }
 
 /*
                 eventfd
 */
-inline int eventfd(unsigned int initval, int flags)
-{
-    return ::eventfd(initval, flags);
-}
+inline int eventfd(unsigned int initval, int flags) { return ::eventfd(initval, flags); }
 
 /*
                 syscall
 */
-inline long tid()
-{
-    return ::syscall(SYS_gettid);
-}
+inline long tid() { return ::syscall(SYS_gettid); }
 
 } // namespace detail
 } // namespace qinmo
