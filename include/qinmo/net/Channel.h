@@ -31,6 +31,9 @@ public:
     Channel(const Channel&) = delete;
     Channel& operator()(const Channel&) = delete;
 
+    Channel(Channel&&) = delete;
+    Channel& operator()(Channel&&) = delete;
+
 public:
     /// @brief get information of channel
     int fd() const;

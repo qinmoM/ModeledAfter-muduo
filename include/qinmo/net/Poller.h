@@ -33,6 +33,9 @@ public:
     Poller(const Poller&) = delete;
     Poller& operator()(const Poller&) = delete;
 
+    Poller(Poller&&) = delete;
+    Poller& operator()(Poller&&) = delete;
+
 public:
     /// @brief event loop
     /// @param timeoutMs time-out (milliseconds)
