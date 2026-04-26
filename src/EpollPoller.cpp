@@ -18,7 +18,7 @@ EpollPoller::EpollPoller(EventLoop* eventLoop)
 
 EpollPoller::~EpollPoller()
 {
-    detail::close(epollfd_);
+    qinmo::detail::close(epollfd_);
 }
 
 Timestamp EpollPoller::poll(int timeoutMs, ChannelList& list)
