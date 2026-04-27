@@ -63,7 +63,7 @@ private:
     std::atomic<bool> quit_;
     std::atomic<bool> looping_;
     std::atomic<bool> pending_;
-    const qinmo::detail::ThreadType tid_;
+    const qinmo::detail::ThreadIDType tid_;
 
 };
 } // namespace net

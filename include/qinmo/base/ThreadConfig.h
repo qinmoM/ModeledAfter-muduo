@@ -9,16 +9,16 @@ namespace detail
 {
 
 #ifdef __linux__
-    using ThreadType = pid_t;
+    using ThreadIDType = pid_t;
 
-    static constexpr ThreadType threadTypeEmpty = 0;
+    static constexpr ThreadIDType threadIDTypeEmpty = 0;
 #else
     #error "Platform not supported"
 #endif
 
 
 
-inline ThreadType getTid();
+inline ThreadIDType getTid();
 
 } // namespace detail
 } // qinmo
