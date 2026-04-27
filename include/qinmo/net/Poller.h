@@ -31,10 +31,10 @@ public:
     virtual ~Poller() = default;
 
     Poller(const Poller&) = delete;
-    Poller& operator()(const Poller&) = delete;
+    Poller& operator=(const Poller&) = delete;
 
     Poller(Poller&&) = delete;
-    Poller& operator()(Poller&&) = delete;
+    Poller& operator=(Poller&&) = delete;
 
 public:
     /// @brief event loop

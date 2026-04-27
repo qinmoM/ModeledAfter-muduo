@@ -18,10 +18,10 @@ public:
     ~EpollPoller();
 
     EpollPoller(const EpollPoller&) = delete;
-    EpollPoller& operator()(const EpollPoller&) = delete;
+    EpollPoller& operator=(const EpollPoller&) = delete;
 
     EpollPoller(EpollPoller&&) = delete;
-    EpollPoller& operator()(EpollPoller&&) = delete;
+    EpollPoller& operator=(EpollPoller&&) = delete;
 
 public:
     Timestamp poll(int timeoutMs, ChannelList& list) override;

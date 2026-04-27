@@ -21,10 +21,10 @@ public:
     ~EventLoop();
 
     EventLoop(const EventLoop&) = delete;
-    EventLoop& operator()(const EventLoop&) = delete;
+    EventLoop& operator=(const EventLoop&) = delete;
 
     EventLoop(EventLoop&&) = delete;
-    EventLoop& operator()(EventLoop&&) = delete;
+    EventLoop& operator=(EventLoop&&) = delete;
 
 public:
     void loop();
