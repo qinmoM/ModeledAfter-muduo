@@ -8,7 +8,12 @@ Thread::Thread(ThreadFunc func)
     , started_(false)
     , joined_(false)
     , id_(qinmo::detail::threadIDTypeEmpty)
-{ }
+{
+    if (!func_)
+    {
+        // logger :  "Thread.func_ must is not nullptr";
+    }
+}
 
 Thread::~Thread()
 {
