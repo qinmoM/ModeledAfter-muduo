@@ -56,7 +56,7 @@ private:
 
 };
 
-bool operator==(const StringView& a, const StringView& b) { return 0 == strncmp(a.data(), b.data(), a.size()); }
-bool operator!=(const StringView& a, const StringView& b) { return !(a == b); }
+inline bool operator==(const StringView& a, const StringView& b) { return 0 == strncmp(a.data(), b.data(), a.size()); }
+inline bool operator!=(const StringView& a, const StringView& b) { return !(a == b); }
 
 } // namespace qinmo

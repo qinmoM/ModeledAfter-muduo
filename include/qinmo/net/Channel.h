@@ -7,14 +7,15 @@
 #include <memory>
 #include <vector>
 
-class EventLoop;
-
 namespace qinmo
 {
 /// @namespace qinmo::net
 namespace net
 {
 
+class EventLoop;
+
+class Channel;
 using ChannelList = std::vector<Channel*>;
 
 /**

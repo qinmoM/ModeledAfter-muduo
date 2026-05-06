@@ -18,7 +18,7 @@ namespace detail
 
 
 
-inline ThreadIDType getTid();
+ThreadIDType getTid();
 
 } // namespace detail
 } // qinmo
