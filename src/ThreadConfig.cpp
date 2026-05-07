@@ -16,5 +16,10 @@ ThreadIDType getTid()
     return cached_thread_id;
 }
 
+uint32_t getTid32()
+{
+    return static_cast<uint32_t>(getTid());
+}
+
 } // namespace detail
 } // namespace qinmo
