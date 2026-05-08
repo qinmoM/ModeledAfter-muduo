@@ -24,6 +24,7 @@ class InetAddr
 {
 public:
     explicit InetAddr(bool isIPv4 = true);
+    explicit InetAddr(const detail::sockaddr& addr);
 
 public:
     /// @brief get family

@@ -1,4 +1,5 @@
 #include "qinmo/net/InetAddr.h"
+#include <stdexcept>
 
 namespace qinmo::net
 {
@@ -11,6 +12,30 @@ InetAddr::InetAddr(bool isIPv4)
         addr_.addr4_.sin_family = AF_INET;
     else
         addr_.addr6_.sin6_family = AF_INET6;
+}
+
+InetAddr::InetAddr(const detail::sockaddr& addr)
+{
+    if (addr.sa_family != AF_INET && addr.sa_family != AF_INET6)
+        throw std::invalid_argument("unsupported protocol family. | InetAddr::InetAddr");
+
+    detail::zeroMemory(&addr_, sizeof(addr_));
+    const detail::sockaddr* p = &addr;
+
+    if (addr.sa_family == AF_INET)
+    {
+        const detail::sockaddr_in* addr4 = detail::sockaddr_cast<const detail::sockaddr, const detail::sockaddr_in>(p);
+        addr_.addr4_.sin_family = AF_INET;
+        addr_.addr4_.sin_port = addr4->sin_port;
+        addr_.addr4_.sin_addr = addr4->sin_addr;
+    }
+    else
+    {
+        const detail::sockaddr_in6* addr6 = detail::sockaddr_cast<const detail::sockaddr, const detail::sockaddr_in6>(p);
+        addr_.addr6_.sin6_family = AF_INET6;
+        addr_.addr6_.sin6_port = addr6->sin6_port;
+        addr_.addr6_.sin6_addr = addr6->sin6_addr;
+    }
 }
 
 bool InetAddr::isIPv4() const
