@@ -9,17 +9,17 @@ namespace net
 {
 
 /// @brief encapsulate multiple EventLoopThread
-class EventLoopThreadLoop
+class EventLoopThreadPool
 {
 public:
-    EventLoopThreadLoop(int numSubThread = 0);
-    ~EventLoopThreadLoop() = default;
+    EventLoopThreadPool(EventLoop* mainLoop, int numSubThread = 0);
+    ~EventLoopThreadPool() = default;
 
-    EventLoopThreadLoop(const EventLoopThreadLoop&) = delete;
-    EventLoopThreadLoop& operator()(const EventLoopThreadLoop&) = delete;
+    EventLoopThreadPool(const EventLoopThreadPool&) = delete;
+    EventLoopThreadPool& operator()(const EventLoopThreadPool&) = delete;
 
-    EventLoopThreadLoop(EventLoopThreadLoop&&) = delete;
-    EventLoopThreadLoop& operator()(EventLoopThreadLoop&&) = delete;
+    EventLoopThreadPool(EventLoopThreadPool&&) = delete;
+    EventLoopThreadPool& operator()(EventLoopThreadPool&&) = delete;
 
 public:
     /// @brief return true if started all loops.
@@ -39,6 +39,7 @@ private:
     std::vector<EventLoop*> loops_;
 
     std::atomic<bool> started_;
+    std::atomic<unsigned int> next_;
 
 };
 } // namespace net
