@@ -6,7 +6,7 @@ namespace qinmo
 namespace net
 {
 
-EventLoopThreadPool::EventLoopThreadPool(EventLoop* mainLoop, int numSubThread)
+EventLoopThreadPool::EventLoopThreadPool(EventLoop* mainLoop, unsigned int numSubThread)
     : started_(false)
     , next_(0)
     , baseLoop_(mainLoop)
@@ -21,13 +21,18 @@ bool EventLoopThreadPool::started() const
 
 std::vector<EventLoop*> EventLoopThreadPool::getAllLoops()
 {
-    return loops_;
+    return loops_.size() > 0 ? loops_ : std::vector<EventLoop*>(1, baseLoop_);
 }
 
 void EventLoopThreadPool::start(EventLoopThread::EventLoopThreadInitFunc func)
 {
-    started_.store(true);
+    if (started_.load())
+    {
+        QINMO_ERROR("Cannot start again.");
+        return;
+    }
 
+    started_.store(true);
     for (int i = 0; i < loops_.size(); ++i)
     {
         threads_[i].reset(new EventLoopThread(func));

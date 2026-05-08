@@ -12,7 +12,7 @@ namespace net
 class EventLoopThreadPool
 {
 public:
-    EventLoopThreadPool(EventLoop* mainLoop, int numSubThread = 0);
+    EventLoopThreadPool(EventLoop* mainLoop, unsigned int numSubThread = 0);
     ~EventLoopThreadPool() = default;
 
     EventLoopThreadPool(const EventLoopThreadPool&) = delete;
@@ -35,6 +35,7 @@ public:
 
 private:
     EventLoop* baseLoop_;
+
     std::vector<std::unique_ptr<EventLoopThread>> threads_;
     std::vector<EventLoop*> loops_;
 
