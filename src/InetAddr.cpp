@@ -16,12 +16,15 @@ InetAddr::InetAddr(bool isIPv4)
 
 InetAddr::InetAddr(const detail::sockaddr& addr)
 {
-    if (addr.sa_family != AF_INET && addr.sa_family != AF_INET6)
-        throw std::invalid_argument("unsupported protocol family. | InetAddr::InetAddr");
-
     detail::zeroMemory(&addr_, sizeof(addr_));
-    const detail::sockaddr* p = &addr;
 
+    if (addr.sa_family != AF_INET && addr.sa_family != AF_INET6)
+    {
+        addr_.addr4_.sin_family = AF_UNSPEC;
+        return;
+    }
+
+    const detail::sockaddr* p = &addr;
     if (addr.sa_family == AF_INET)
     {
         const detail::sockaddr_in* addr4 = detail::sockaddr_cast<const detail::sockaddr, const detail::sockaddr_in>(p);

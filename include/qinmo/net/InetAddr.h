@@ -35,7 +35,7 @@ public:
     uint16_t getPort() const;
     /// @brief get IP address
     std::string getIP() const;
-    /// @brief get sockaddr
+    /// @brief get sockaddr from current address
     const sockaddr& getSockaddr() const;
 
     /// @brief set the IP address
