@@ -22,11 +22,17 @@ class SocketTCP
 {
 public:
     /// @brief create a new socket
-    /// @param addr 
-    /// @return  using the move constructor
+    /// @param addr only access protocol family
+    /// @return using the move constructor
+    /// @note better to check if the returned value is valid : Call function isValid()
     static SocketTCP create(const InetAddr& addr);
+    /// @brief attach an existing socket
+    /// @param fd file descriptor
+    /// @return using the move constructor
+    /// @note must check if the returned value is valid : Call function isValid()
     static SocketTCP attach(const int fd);
 
+public:
     SocketTCP();
     ~SocketTCP();
 
@@ -37,16 +43,32 @@ public:
     SocketTCP& operator=(const SocketTCP&) = delete;
 
 public:
-    bool valid() const;
+    /// @brief whether it has been initialized
+    bool isValid() const;
+    /// @brief get current file descriptor
     int getfd() const;
+    /// @brief get local address
+    /// @note need to Check if the returned InetAddr is valid : Call functions isIPv4() and isIPv6()
     InetAddr getLocalAddr() const;
+    /// @brief get peer address
+    /// @note need to Check if the returned InetAddr is valid : Call functions isIPv4() and isIPv6()
     InetAddr getPeerAddr() const;
 
+    ssize_t recv(char* buf, size_t len);
+    ssize_t send(char* buf, size_t len);
+    /// @brief bind local address
     bool bind(const InetAddr& addr);
+    /// @brief listen client socket
     bool listen(int num = 128);
+    /// @note will block
+    /// @return a new SocketTCP object. Thought getLocalAddr/getPeerAddr obtain address
     SocketTCP accept();
+    /// @brief connect server
+    /// @param addr server address
+    bool connect(const InetAddr& addr);
     bool close();
 
+    /// @brief set whether to enable port reuse
     bool portReuse(bool enable);
 
 private:

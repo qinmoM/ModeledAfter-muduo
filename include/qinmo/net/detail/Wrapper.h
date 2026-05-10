@@ -90,13 +90,17 @@ inline bool getsockname(int sockfd, sockaddr& addr) { socklen_t len = 0; return 
 inline bool getpeername(int sockfd, sockaddr& addr) { socklen_t len = 0; return ::getpeername(sockfd, &addr, &len); }
 
 inline int socket(int af, int type, int protocol = 0) { return ::socket(af, type, protocol); }
-inline bool portReuse(int sockfd, bool enable) { int opt = enable ? 1 : 0; return 0 == ::setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)); }
 inline bool bind(int sockfd, const sockaddr& addr) { return 0 == ::bind(sockfd, &addr, sizeof(sockaddr)); }
 inline bool listen(int sockfd, int num = 128){ return 0 == ::listen(sockfd, num); };
 inline ssize_t send(int sockfd, void* buf, size_t count) { return ::send(sockfd, buf, count, 0); }
 inline ssize_t recv(int sockfd, void* buf, size_t count) { return ::recv(sockfd, buf, count, 0); }
 inline ssize_t sendto(int sockfd, void* buf, size_t count, const sockaddr& addr) { return ::sendto(sockfd, buf, count, 0, &addr, sizeof(sockaddr)); }
 inline ssize_t recvfrom(int sockfd, void* buf, size_t count, sockaddr& addr, unsigned int& len) { return ::recvfrom(sockfd, buf, count, 0, &addr, &len); }
+
+inline bool isPortReuse(int sockfd) { int opt; socklen_t len = sizeof(opt); return 0 == ::getsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &opt, &len) && 1 == opt; }
+inline bool setPortReuse(int sockfd, bool enable) { int opt = enable ? 1 : 0; return 0 == ::setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)); }
+/// @return 0 if fails
+inline int getSocketType(int sockfd) { int opt; socklen_t len = sizeof(opt); return (0 == ::getsockopt(sockfd, SOL_SOCKET, SO_TYPE, &opt, &len) ? opt : 0); }
 
 } // namespace detail
 } // namespace net
