@@ -25,7 +25,7 @@ public:
     /// @param addr only access protocol family
     /// @return using the move constructor
     /// @note better to check if the returned value is valid : Call function isValid()
-    static SocketTCP create(const InetAddr& addr);
+    static SocketTCP create(const InetAddr& addr, int flags = 0);
     /// @brief attach an existing socket
     /// @param fd file descriptor
     /// @return using the move constructor
@@ -60,9 +60,12 @@ public:
     bool bind(const InetAddr& addr);
     /// @brief listen client socket
     bool listen(int num = 128);
-    /// @note will block
-    /// @return a new SocketTCP object. Thought getLocalAddr/getPeerAddr obtain address
-    SocketTCP accept();
+    /// @return a new SocketTCP object
+    /// @note
+    /// Thought getPeerAddr obtain address if you input nullptr
+    ///
+    /// must check whether InetAddr and SocketTCP is invalid
+    SocketTCP accept(InetAddr& addr, int flags = 0);
     /// @brief connect server
     /// @param addr server address
     bool connect(const InetAddr& addr);
