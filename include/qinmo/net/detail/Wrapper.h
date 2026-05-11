@@ -25,9 +25,13 @@ namespace net
 namespace detail
 {
 
-using sockaddr = struct ::sockaddr;
 using sockaddr_in = struct ::sockaddr_in;
 using sockaddr_in6 = struct ::sockaddr_in6;
+union sockaddr
+{
+    sockaddr_in addr4_;
+    sockaddr_in6 addr6_;
+};
 
 /// @brief convert sockaddr pointer to/from sockaddr_in/sockaddr_in6 pointer
 /// @tparam from type of t parameter
@@ -49,13 +53,22 @@ inline sockaddr* sockaddr_cast(sockaddr_in* addr) { return static_cast<sockaddr*
 template <>
 inline sockaddr* sockaddr_cast(sockaddr_in6* addr) { return static_cast<sockaddr*>(static_cast<void*>(addr)); }
 template <>
-inline const sockaddr_in* sockaddr_cast(const sockaddr* addr) { return static_cast<const sockaddr_in*>(static_cast<const void*>(addr)); }
+inline const sockaddr_in* sockaddr_cast(const sockaddr* addr) { return &addr->addr4_; }
 template <>
-inline const sockaddr_in6* sockaddr_cast(const sockaddr* addr) { return static_cast<const sockaddr_in6*>(static_cast<const void*>(addr)); }
+inline const sockaddr_in6* sockaddr_cast(const sockaddr* addr) { return &addr->addr6_; }
 template <>
-inline sockaddr_in* sockaddr_cast(sockaddr* addr) { return static_cast<sockaddr_in*>(static_cast<void*>(addr)); }
+inline sockaddr_in* sockaddr_cast(sockaddr* addr) { return &addr->addr4_; }
 template <>
-inline sockaddr_in6* sockaddr_cast(sockaddr* addr) { return static_cast<sockaddr_in6*>(static_cast<void*>(addr)); }
+inline sockaddr_in6* sockaddr_cast(sockaddr* addr) { return &addr->addr6_; }
+/// @brief detail::sockaddr convert to generic sockaddr
+template <>
+inline ::sockaddr* sockaddr_cast(sockaddr* addr) { return static_cast<::sockaddr*>(static_cast<void*>(addr)); }
+template <>
+inline const ::sockaddr* sockaddr_cast(const sockaddr* addr) { return static_cast<const ::sockaddr*>(static_cast<const void*>(addr)); }
+template <>
+inline sockaddr* sockaddr_cast(::sockaddr* addr) { return static_cast<sockaddr*>(static_cast<void*>(addr)); }
+template <>
+inline const sockaddr* sockaddr_cast(const ::sockaddr* addr) { return static_cast<const sockaddr*>(static_cast<const void*>(addr)); }
 
 /// @brief network to host byte order, supporting 16-bit, 32-bit and 64-bit unsigned intergers
 /// @param net network order
@@ -86,16 +99,17 @@ inline bool pton6(StringView cp, in6_addr& addr) { return 1 == ::inet_pton(AF_IN
 inline std::string ntop4(const in_addr& addr) { char buf[INET_ADDRSTRLEN]; return ::inet_ntop(AF_INET, &addr, buf, sizeof(buf)); }
 inline std::string ntop6(const in6_addr& addr) { char buf[INET6_ADDRSTRLEN]; return ::inet_ntop(AF_INET6, &addr, buf, sizeof(buf)); }
 
-inline bool getsockname(int sockfd, sockaddr& addr) { socklen_t len = 0; return ::getsockname(sockfd, &addr, &len); }
-inline bool getpeername(int sockfd, sockaddr& addr) { socklen_t len = 0; return ::getpeername(sockfd, &addr, &len); }
+inline bool getsockname(int sockfd, sockaddr& addr) { socklen_t len = sizeof(addr); return ::getsockname(sockfd, sockaddr_cast<sockaddr, ::sockaddr>(&addr), &len); }
+inline bool getpeername(int sockfd, sockaddr& addr) { socklen_t len = sizeof(sockaddr_in6); return ::getpeername(sockfd, sockaddr_cast<sockaddr, ::sockaddr>(&addr), &len); }
 
 inline int socket(int af, int type, int protocol = 0) { return ::socket(af, type, protocol); }
-inline bool bind(int sockfd, const sockaddr& addr) { return 0 == ::bind(sockfd, &addr, sizeof(sockaddr)); }
+inline bool bind(int sockfd, const sockaddr& addr) { return 0 == ::bind(sockfd, sockaddr_cast<const sockaddr, const ::sockaddr>(&addr), sizeof(addr)); }
 inline bool listen(int sockfd, int num = 128){ return 0 == ::listen(sockfd, num); };
+inline int accept(int sockfd, sockaddr& addr, int flags = 0) { socklen_t len = sizeof(addr); return ::accept4(sockfd, sockaddr_cast<sockaddr, ::sockaddr>(&addr), &len, flags); }
 inline ssize_t send(int sockfd, void* buf, size_t count) { return ::send(sockfd, buf, count, 0); }
 inline ssize_t recv(int sockfd, void* buf, size_t count) { return ::recv(sockfd, buf, count, 0); }
-inline ssize_t sendto(int sockfd, void* buf, size_t count, const sockaddr& addr) { return ::sendto(sockfd, buf, count, 0, &addr, sizeof(sockaddr)); }
-inline ssize_t recvfrom(int sockfd, void* buf, size_t count, sockaddr& addr, unsigned int& len) { return ::recvfrom(sockfd, buf, count, 0, &addr, &len); }
+inline ssize_t sendto(int sockfd, void* buf, size_t count, const sockaddr& addr) { return ::sendto(sockfd, buf, count, 0,sockaddr_cast<const sockaddr, const ::sockaddr>(&addr), sizeof(sockaddr)); }
+inline ssize_t recvfrom(int sockfd, void* buf, size_t count, sockaddr& addr, unsigned int& len) { return ::recvfrom(sockfd, buf, count, 0, sockaddr_cast<sockaddr, ::sockaddr>(&addr), &len); }
 
 inline bool isPortReuse(int sockfd) { int opt; socklen_t len = sizeof(opt); return 0 == ::getsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &opt, &len) && 1 == opt; }
 inline bool setPortReuse(int sockfd, bool enable) { int opt = enable ? 1 : 0; return 0 == ::setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)); }
