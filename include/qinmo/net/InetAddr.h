@@ -36,7 +36,7 @@ public:
     /// @brief get IP address
     std::string getIP() const;
     /// @brief get sockaddr from current address
-    const sockaddr& getSockaddr() const;
+    const detail::sockaddr& getSockaddr() const;
 
     /// @brief set the IP address
     /// @param str dotted decimal notation
@@ -47,14 +47,7 @@ public:
     void setPort(uint16_t port);
 
 private:
-    union SocketAddrType
-    {
-        struct sockaddr_in addr4_;
-        struct sockaddr_in6 addr6_;
-    };
-
-private:
-    SocketAddrType addr_;
+    detail::sockaddr addr_;
 
 };
 

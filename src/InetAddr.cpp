@@ -18,14 +18,14 @@ InetAddr::InetAddr(const detail::sockaddr& addr)
 {
     detail::zeroMemory(&addr_, sizeof(addr_));
 
-    if (addr.sa_family != AF_INET && addr.sa_family != AF_INET6)
+    if (detail::sockaddr_cast<const detail::sockaddr, const sockaddr>(&addr)->sa_family != AF_INET && detail::sockaddr_cast<const detail::sockaddr, const sockaddr>(&addr)->sa_family != AF_INET6)
     {
         addr_.addr4_.sin_family = AF_UNSPEC;
         return;
     }
 
     const detail::sockaddr* p = &addr;
-    if (addr.sa_family == AF_INET)
+    if (detail::sockaddr_cast<const detail::sockaddr, const sockaddr>(&addr)->sa_family == AF_INET)
     {
         const detail::sockaddr_in* addr4 = detail::sockaddr_cast<const detail::sockaddr, const detail::sockaddr_in>(p);
         addr_.addr4_.sin_family = AF_INET;
@@ -67,12 +67,16 @@ std::string InetAddr::getIP() const
         return detail::ntop6(addr_.addr6_.sin6_addr);
 }
 
-const sockaddr& InetAddr::getSockaddr() const
+const detail::sockaddr& InetAddr::getSockaddr() const
 {
     if (isIPv4())
-        return *detail::sockaddr_cast<const sockaddr_in, const sockaddr>(&(addr_.addr4_));
+    {
+        return *detail::sockaddr_cast<const detail::sockaddr_in, const detail::sockaddr>(&(addr_.addr4_));
+    }
     else
-        return *detail::sockaddr_cast<const sockaddr_in6, const sockaddr>(&(addr_.addr6_));
+    {
+        return *detail::sockaddr_cast<const sockaddr_in6, const detail::sockaddr>(&(addr_.addr6_));
+    }
 }
 
 bool InetAddr::setIP(const StringView& str)
