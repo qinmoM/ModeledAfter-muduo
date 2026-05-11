@@ -85,7 +85,7 @@ inline uint64_t hostToNet64(uint64_t host) { return htobe64(host); }
 /// @brief initialize this memory block to zero
 /// @param buf pointer
 /// @param len length
-inline void zeroMemory(void* buf, size_t len) { bzero(buf, len); }
+inline void zeroMemory(void* buf, size_t len) { ::bzero(buf, len); }
 
 /// @brief convert dotted decimal to network byte order
 /// @param cp dotted decimal string

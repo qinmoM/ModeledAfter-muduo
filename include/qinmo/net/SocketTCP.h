@@ -24,12 +24,12 @@ public:
     /// @brief create a new socket
     /// @param addr only access protocol family
     /// @return using the move constructor
-    /// @note better to check if the returned value is valid : Call function isValid()
+    /// @note better to check whether the returned value is valid : Call function isValid()
     static SocketTCP create(const InetAddr& addr, int flags = 0);
     /// @brief attach an existing socket
     /// @param fd file descriptor
     /// @return using the move constructor
-    /// @note must check if the returned value is valid : Call function isValid()
+    /// @note must check whether the returned value is valid : Call function isValid()
     static SocketTCP attach(const int fd);
 
 public:
@@ -43,7 +43,7 @@ public:
     SocketTCP& operator=(const SocketTCP&) = delete;
 
 public:
-    /// @brief whether it has been initialized
+    /// @return return true it has been initialized
     bool isValid() const;
     /// @brief get current file descriptor
     int getfd() const;
