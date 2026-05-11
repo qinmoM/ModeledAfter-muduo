@@ -10,9 +10,10 @@ EventLoopThreadPool::EventLoopThreadPool(EventLoop* mainLoop, unsigned int numSu
     : started_(false)
     , next_(0)
     , baseLoop_(mainLoop)
-    , threads_(numSubThread, nullptr)
-    , loops_(numSubThread, nullptr)
-{ }
+{
+    threads_.reserve(numSubThread);
+    loops_.reserve(numSubThread);
+}
 
 bool EventLoopThreadPool::started() const
 {
@@ -35,8 +36,8 @@ void EventLoopThreadPool::start(EventLoopThread::EventLoopThreadInitFunc func)
     started_.store(true);
     for (int i = 0; i < loops_.size(); ++i)
     {
-        threads_[i].reset(new EventLoopThread(func));
-        loops_[i] = threads_[i]->start();
+        threads_.emplace_back(new EventLoopThread(func));
+        loops_.emplace_back(threads_[i]->start());
     }
 
     if (loops_.size() == 0)
