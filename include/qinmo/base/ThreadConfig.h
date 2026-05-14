@@ -5,6 +5,7 @@
 namespace qinmo
 {
 /// @namespace qinmo::detail
+/// @note For internal use only, do NOT use it from outside the library
 namespace detail
 {
 

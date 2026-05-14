@@ -21,7 +21,7 @@ namespace qinmo
 namespace net
 {
 /// @namespace qinmo::net::detail
-/// @warning For internal use only, do NOT use from outside the library 
+/// @warning For internal use only, do NOT use it from outside the library
 namespace detail
 {
 

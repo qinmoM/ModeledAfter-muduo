@@ -25,7 +25,7 @@ constexpr const char* loggerPath = "../logs/logger.log";
 
 
 /// @namespace qinmo::log::detail
-/// @warning For internal use only, do NOT use from outside the library
+/// @warning For internal use only, do NOT use it from outside the library
 namespace detail
 {
 ///
