@@ -100,8 +100,8 @@ inline bool pton6(StringView cp, in6_addr& addr) { return 1 == ::inet_pton(AF_IN
 inline std::string ntop4(const in_addr& addr) { char buf[INET_ADDRSTRLEN]; return ::inet_ntop(AF_INET, &addr, buf, sizeof(buf)); }
 inline std::string ntop6(const in6_addr& addr) { char buf[INET6_ADDRSTRLEN]; return ::inet_ntop(AF_INET6, &addr, buf, sizeof(buf)); }
 
-inline bool getsockname(int sockfd, sockaddr& addr) { socklen_t len = sizeof(addr); return ::getsockname(sockfd, sockaddr_cast<sockaddr, ::sockaddr>(&addr), &len); }
-inline bool getpeername(int sockfd, sockaddr& addr) { socklen_t len = sizeof(addr); return ::getpeername(sockfd, sockaddr_cast<sockaddr, ::sockaddr>(&addr), &len); }
+inline bool getsockname(int sockfd, sockaddr& addr) { socklen_t len = sizeof(addr); return 0 == ::getsockname(sockfd, sockaddr_cast<sockaddr, ::sockaddr>(&addr), &len); }
+inline bool getpeername(int sockfd, sockaddr& addr) { socklen_t len = sizeof(addr); return 0 == ::getpeername(sockfd, sockaddr_cast<sockaddr, ::sockaddr>(&addr), &len); }
 
 inline int socket(int af, int type, int protocol = 0) { return ::socket(af, type, protocol); }
 inline bool bind(int sockfd, const sockaddr& addr) { return 0 == ::bind(sockfd, sockaddr_cast<const sockaddr, const ::sockaddr>(&addr), sizeof(addr)); }

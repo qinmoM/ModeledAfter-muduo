@@ -5,7 +5,7 @@
 // #include "qinmo/base/StringConcat.h"
 // #include "qinmo/base/Logger.h"
 // #include "qinmo/net/TcpConnect.h"
-// #include "qinmo/net/TcpListen.h"
+#include "qinmo/net/TcpListen.h"
 #include <iostream>
 
 // using qinmo::Timestamp;
@@ -73,26 +73,29 @@ int main()
     // std::cout << buf << std::endl;
     // connect.send("123456789", 9);
 
-    // using namespace qinmo::net;
-    // InetAddr serAddr;
-    // serAddr.setIP("192.168.87.90");
-    // serAddr.setPort(7129);
-    // TcpListen lsock = TcpListen::createRaw(serAddr);
-    //
-    // #define TEMP_EOE(isTrue, describe) if (!isTrue) { perror(describe); return -1; }
-    //
-    // TEMP_EOE(lsock.isValid(), "isValid");
-    // TEMP_EOE(lsock.setReuseAddr(true), "reuse address");
-    // TEMP_EOE(lsock.setReusePort(true), "reuse port");
-    // TEMP_EOE(lsock.bind(serAddr), "bind");
-    // TEMP_EOE(lsock.listen(), "listen");
-    // InetAddr cliAddr;
-    // TcpConnect cli = lsock.accept(cliAddr);
-    // TEMP_EOE(0 >= cli.send("ok\n", 3), "send");
-    // char buf[1024] = "";
-    // TEMP_EOE(0 >= cli.recv(buf, sizeof(buf)), "recv");
-    // buf[1023] = '\0';
-    // std::cout << buf << std::endl;
+    using namespace qinmo::net;
+    InetAddr serAddr;
+    serAddr.setIP("192.168.87.90");
+    serAddr.setPort(7129);
+    TcpListen lsock = TcpListen::createRaw(serAddr);
+    
+    #define TEMP_EOE(isTrue, describe) if (!isTrue) { perror(describe); return -1; }
+    
+    TEMP_EOE(lsock.isValid(), "isValid");
+    TEMP_EOE(lsock.setReuseAddr(true), "reuse address");
+    TEMP_EOE(lsock.setReusePort(true), "reuse port");
+    TEMP_EOE(lsock.bind(serAddr), "bind");
+    TEMP_EOE(lsock.listen(), "listen");
+    InetAddr cliAddr;
+    TcpConnect cli = lsock.accept(cliAddr);
+    TEMP_EOE(0 >= cli.send("ok\n", 3), "send");
+    char buf[1024] = "";
+    TEMP_EOE(0 >= cli.recv(buf, sizeof(buf)), "recv");
+    buf[1023] = '\0';
+    std::cout << buf << std::endl;
+    InetAddr local = lsock.getLocalAddr();
+    std::cout << local.getIP() << std::endl;
+    std::cout << cli.getPeerAddr().getIP() << std::endl;
 
     return 0;
 }
