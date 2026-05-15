@@ -4,11 +4,11 @@
 // #include "qinmo/net/SocketTCP.h"
 // #include "qinmo/base/StringConcat.h"
 // #include "qinmo/base/Logger.h"
-#include "qinmo/net/TcpConnect.h"
+// #include "qinmo/net/TcpConnect.h"
+#include "qinmo/net/TcpListen.h"
 #include <iostream>
 
 // using qinmo::Timestamp;
-#define TEMP_EOE()
 
 int main()
 {
@@ -58,29 +58,41 @@ int main()
     // QINMO_ERROR("This is a trial ", 6, " and ", 0);
     // QINMO_FATAL("This is a trial ", 2, " and ", 0);
 
+    // using namespace qinmo::net;
+    // InetAddr server;
+    // server.setIP("192.168.87.212");
+    // server.setPort(7129);
+    //
+    // #define TEMP_EOE(isTrue, describe) if (!isTrue) { std::cout << describe << std::endl; return -1; }
+    //
+    // TEMP_EOE(server.isValid(), "server address error.");
+    // TcpConnect connect = TcpConnect::connectRaw(server);
+    // TEMP_EOE(connect.isValid(), "connect invalid.");
+    // char buf[1024] = "";
+    // TEMP_EOE(-1 != connect.recv(buf, sizeof(buf)),"connect.recv");
+    // std::cout << buf << std::endl;
+    // connect.send("123456789", 9);
+
     using namespace qinmo::net;
-    InetAddr server;
-    server.setIP("192.168.87.212");
-    server.setPort(7129);
-    if (!server.isValid())
-    {
-        std::cout << "server address invalid." << std::endl;
-        return -1;
-    }
-    TcpConnect connect = TcpConnect::connectRaw(server);
-    if (!connect.isValid())
-    {
-        std::cout << "connect invalid." << std::endl;
-        return -1;
-    }
+    InetAddr serAddr;
+    serAddr.setIP("192.168.87.90");
+    serAddr.setPort(7129);
+    TcpListen lsock = TcpListen::createRaw(serAddr);
+
+    #define TEMP_EOE(isTrue, describe) if (!isTrue) { perror(describe); return -1; }
+
+    TEMP_EOE(lsock.isValid(), "isValid");
+    TEMP_EOE(lsock.setReuseAddr(true), "reuse address");
+    TEMP_EOE(lsock.setReusePort(true), "reuse port");
+    TEMP_EOE(lsock.bind(serAddr), "bind");
+    TEMP_EOE(lsock.listen(), "listen");
+    InetAddr cliAddr;
+    TcpConnect cli = lsock.accept(cliAddr);
+    TEMP_EOE(0 >= cli.send("ok\n", 3), "send");
     char buf[1024] = "";
-    if (-1 == connect.recv(buf, sizeof(buf)))
-    {
-        perror("connect.recv");
-        return -1;
-    }
+    TEMP_EOE(0 >= cli.recv(buf, sizeof(buf)), "recv");
+    buf[1023] = '\0';
     std::cout << buf << std::endl;
-    connect.send("123456789", 9);
 
     return 0;
 }
