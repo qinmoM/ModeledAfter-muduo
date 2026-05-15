@@ -13,6 +13,7 @@
 #include <arpa/inet.h>
 #include <endian.h>
 #include <stdint.h>
+#include <netinet/tcp.h>
 
 /// @namespace qinmo
 namespace qinmo
@@ -106,15 +107,20 @@ inline int socket(int af, int type, int protocol = 0) { return ::socket(af, type
 inline bool bind(int sockfd, const sockaddr& addr) { return 0 == ::bind(sockfd, sockaddr_cast<const sockaddr, const ::sockaddr>(&addr), sizeof(addr)); }
 inline bool listen(int sockfd, int num = 128){ return 0 == ::listen(sockfd, num); };
 inline int accept(int sockfd, sockaddr& addr, int flags = 0) { socklen_t len = sizeof(addr); return ::accept4(sockfd, sockaddr_cast<sockaddr, ::sockaddr>(&addr), &len, flags); }
-inline ssize_t send(int sockfd, void* buf, size_t count) { return ::send(sockfd, buf, count, 0); }
+inline bool connect(int sockfd, const sockaddr& addr) { return 0 == ::connect(sockfd, sockaddr_cast<const sockaddr, const ::sockaddr>(&addr), sizeof(addr)); }
+inline ssize_t send(int sockfd, const void* buf, size_t count) { return ::send(sockfd, buf, count, 0); }
 inline ssize_t recv(int sockfd, void* buf, size_t count) { return ::recv(sockfd, buf, count, 0); }
-inline ssize_t sendto(int sockfd, void* buf, size_t count, const sockaddr& addr) { return ::sendto(sockfd, buf, count, 0,sockaddr_cast<const sockaddr, const ::sockaddr>(&addr), sizeof(sockaddr)); }
+inline ssize_t sendto(int sockfd, const void* buf, size_t count, const sockaddr& addr) { return ::sendto(sockfd, buf, count, 0,sockaddr_cast<const sockaddr, const ::sockaddr>(&addr), sizeof(sockaddr)); }
 inline ssize_t recvfrom(int sockfd, void* buf, size_t count, sockaddr& addr, unsigned int& len) { return ::recvfrom(sockfd, buf, count, 0, sockaddr_cast<sockaddr, ::sockaddr>(&addr), &len); }
 
-inline bool isPortReuse(int sockfd) { int opt; socklen_t len = sizeof(opt); return 0 == ::getsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &opt, &len) && 1 == opt; }
-inline bool setPortReuse(int sockfd, bool enable) { int opt = enable ? 1 : 0; return 0 == ::setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)); }
+inline bool isAddrReuse(int sockfd) { int opt = 0; socklen_t len = sizeof(opt); return 0 == ::getsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &opt, &len) && 1 == opt; }
+
+inline bool setAddrReuse(int sockfd, bool enable) { int opt = enable ? 1 : 0; return 0 == ::setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)); }
+inline bool setPortReuse(int sockfd, bool enable) { int opt = enable ? 1 : 0; return 0 == ::setsockopt(sockfd, SOL_SOCKET, SO_REUSEPORT, &opt, sizeof(opt)); }
+inline bool setTcpNoDelay(int sockfd, bool enable) { int opt = enable ? 1 : 0; return 0 == ::setsockopt(sockfd, IPPROTO_TCP, TCP_NODELAY, &opt, sizeof(opt)); }
+inline bool setKeepAlive(int sockfd, bool enable) { int opt = enable ? 1 : 0; return 0 == ::setsockopt(sockfd, SOL_SOCKET, SO_KEEPALIVE, &opt, sizeof(opt)); }
 /// @return 0 if fails
-inline int getSocketType(int sockfd) { int opt; socklen_t len = sizeof(opt); return (0 == ::getsockopt(sockfd, SOL_SOCKET, SO_TYPE, &opt, &len) ? opt : 0); }
+inline int getSocketType(int sockfd) { int opt = 0; socklen_t len = sizeof(opt); return (0 == ::getsockopt(sockfd, SOL_SOCKET, SO_TYPE, &opt, &len) ? opt : 0); }
 
 } // namespace detail
 } // namespace net

@@ -14,7 +14,7 @@ namespace detail
 
 inline int close(int fd) { return ::close(fd); }
 inline ssize_t read(int fd, void* ptr, size_t count) { return ::read(fd, ptr, count); }
-inline ssize_t write(int fd, void* ptr, size_t count) { return ::write(fd, ptr, count); }
+inline ssize_t write(int fd, const void* ptr, size_t count) { return ::write(fd, ptr, count); }
 
 /*
                 eventfd
