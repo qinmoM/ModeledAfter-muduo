@@ -1,11 +1,14 @@
-#include "qinmo/base/Timestamp.h"
-#include "qinmo/net/detail/Wrapper.h"
-#include "qinmo/base/StringView.h"
-#include "qinmo/net/SocketTCP.h"
-#include "qinmo/base/StringConcat.h"
-#include "qinmo/base/Logger.h"
+// #include "qinmo/base/Timestamp.h"
+// #include "qinmo/net/detail/Wrapper.h"
+// #include "qinmo/base/StringView.h"
+// #include "qinmo/net/SocketTCP.h"
+// #include "qinmo/base/StringConcat.h"
+// #include "qinmo/base/Logger.h"
+#include "qinmo/net/TcpConnect.h"
+#include <iostream>
 
-using qinmo::Timestamp;
+// using qinmo::Timestamp;
+#define TEMP_EOE()
 
 int main()
 {
@@ -45,15 +48,39 @@ int main()
     // sockfd.bind(addr);
     //
     // // SockTCP
-    // qinmo::net::SocketTCP sock = qinmo::net::SocketTCP::create(qinmo::net::InetAddr());
+    // qinmo::net::SocketTCP sock = qinmo::net::SocketTCP::createNonBlockOrDie(qinmo::net::InetAddr());
     //
-    // Logger
-    QINMO_TRACE("This is a trial ", 10, " and ", 90);
-    QINMO_DEBUG("This is a trial ", 10, " and ", 0);
-    QINMO_INFO("This is a trial ", 10, " and ", 9);
-    QINMO_WARN("This is a trial ", 1, " and ", 90);
-    QINMO_ERROR("This is a trial ", 6, " and ", 0);
-    QINMO_FATAL("This is a trial ", 2, " and ", 0);
+    // // Logger
+    // QINMO_TRACE("This is a trial ", 10, " and ", 90);
+    // QINMO_DEBUG("This is a trial ", 10, " and ", 0);
+    // QINMO_INFO("This is a trial ", 10, " and ", 9);
+    // QINMO_WARN("This is a trial ", 1, " and ", 90);
+    // QINMO_ERROR("This is a trial ", 6, " and ", 0);
+    // QINMO_FATAL("This is a trial ", 2, " and ", 0);
+
+    using namespace qinmo::net;
+    InetAddr server;
+    server.setIP("192.168.87.212");
+    server.setPort(7129);
+    if (!server.isValid())
+    {
+        std::cout << "server address invalid." << std::endl;
+        return -1;
+    }
+    TcpConnect connect = TcpConnect::connectRaw(server);
+    if (!connect.isValid())
+    {
+        std::cout << "connect invalid." << std::endl;
+        return -1;
+    }
+    char buf[1024] = "";
+    if (-1 == connect.recv(buf, sizeof(buf)))
+    {
+        perror("connect.recv");
+        return -1;
+    }
+    std::cout << buf << std::endl;
+    connect.send("123456789", 9);
 
     return 0;
 }
