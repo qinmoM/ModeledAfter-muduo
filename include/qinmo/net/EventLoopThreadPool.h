@@ -16,10 +16,10 @@ public:
     ~EventLoopThreadPool() = default;
 
     EventLoopThreadPool(const EventLoopThreadPool&) = delete;
-    EventLoopThreadPool& operator()(const EventLoopThreadPool&) = delete;
+    EventLoopThreadPool& operator=(const EventLoopThreadPool&) = delete;
 
     EventLoopThreadPool(EventLoopThreadPool&&) = delete;
-    EventLoopThreadPool& operator()(EventLoopThreadPool&&) = delete;
+    EventLoopThreadPool& operator=(EventLoopThreadPool&&) = delete;
 
 public:
     /// @brief return true if started all loops.

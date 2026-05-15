@@ -20,10 +20,10 @@ public:
     ~EventLoopThread();
 
     EventLoopThread(const EventLoopThread&) = delete;
-    EventLoopThread& operator()(const EventLoopThread&) = delete;
+    EventLoopThread& operator=(const EventLoopThread&) = delete;
 
     EventLoopThread(EventLoopThread&&) = delete;
-    EventLoopThread& operator()(EventLoopThread&&) = delete;
+    EventLoopThread& operator=(EventLoopThread&&) = delete;
 
 public:
     /// @brief start EventLoop and Thread, Get EventLoop pointer
