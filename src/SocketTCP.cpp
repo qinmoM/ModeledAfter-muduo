@@ -1,5 +1,4 @@
 #include "qinmo/net/SocketTCP.h"
-#include <stdexcept>
 
 namespace qinmo::net
 {
@@ -94,7 +93,7 @@ ssize_t  SocketTCP::send(const char* buf, size_t len)
 
 bool SocketTCP::bind(const InetAddr& addr)
 {
-    if (-1 == sockfd_ || 0 != detail::bind(sockfd_, addr.getSockaddr()))
+    if (-1 == sockfd_ || !detail::bind(sockfd_, addr.getSockaddr()))
         return false;
 
     return true;
@@ -102,7 +101,7 @@ bool SocketTCP::bind(const InetAddr& addr)
 
 bool SocketTCP::listen(int num)
 {
-    if (-1 == sockfd_ || detail::listen(num))
+    if (-1 == sockfd_ || !detail::listen(sockfd_, num))
         return false;
 
     return true;

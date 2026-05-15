@@ -23,6 +23,16 @@ public:
     static TcpListen createNonBlockOrDie(const InetAddr& addr);
 
 public:
+    TcpListen();
+    ~TcpListen() = default;
+
+    TcpListen(const TcpListen&) = delete;
+    TcpListen& operator=(const TcpListen&) = delete;
+
+    TcpListen(TcpListen&&) noexcept = default;
+    TcpListen& operator=(TcpListen&&) noexcept = default;
+
+public:
     /// @return return true it has been initialized
     bool isValid() const;
     bool isBind() const;
@@ -37,12 +47,12 @@ public:
     InetAddr getPeerAddr() const;
 
     ssize_t recv(char* buf, size_t len);
-    ssize_t send(char* buf, size_t len);
+    ssize_t send(const char* buf, size_t len);
     /// @brief bind local address
     bool bind(const InetAddr& addr);
     /// @brief listen client socket
     bool listen(int num = 128);
-    TcpConnect accept();
+    TcpConnect accept(InetAddr& addr, int flags = 0);
     /// @note isValid function return false After call close
     bool close();
 
@@ -52,6 +62,8 @@ public:
     bool setReuseAddr(bool enable);
 
 private:
+    TcpListen(SocketTCP&& sock);
+
     enum class TcpListenState : char
     {
         Created = 0,
