@@ -27,6 +27,8 @@ public:
     explicit InetAddr(const detail::sockaddr& addr);
 
 public:
+    /// @return return true if it is IPv4 or IPv6
+    bool isValid() const;
     /// @brief get family
     bool isIPv4() const;
     bool isIPv6() const;

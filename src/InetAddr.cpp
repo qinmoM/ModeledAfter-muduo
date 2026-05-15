@@ -41,6 +41,11 @@ InetAddr::InetAddr(const detail::sockaddr& addr)
     }
 }
 
+bool InetAddr::isValid() const
+{
+    return isIPv4() || isIPv6();
+}
+
 bool InetAddr::isIPv4() const
 {
     return AF_INET == addr_.addr4_.sin_family;
