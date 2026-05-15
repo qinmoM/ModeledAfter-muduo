@@ -9,6 +9,8 @@ namespace qinmo
 namespace net
 {
 
+class TcpListen;
+
 /// @brief encapsulate client socket and connect socket
 /// @note you must specify whether to Create a client use server address or Receive from listen socket
 /// @note   - TcpConnect conn = TcpConnect::connectRaw(InetAddr())
@@ -32,8 +34,8 @@ public:
     TcpConnect(const TcpConnect&) = delete;
     TcpConnect& operator=(const TcpConnect&) = delete;
 
-    TcpConnect(TcpConnect&& tcpConnect) noexcept = default;
-    TcpConnect& operator=(TcpConnect&& tcpConnect) noexcept = default;
+    TcpConnect(TcpConnect&&) noexcept = default;
+    TcpConnect& operator=(TcpConnect&&) noexcept = default;
 
 public:
     /// @return return true it has been initialized
@@ -59,6 +61,8 @@ public:
     bool setKeepAlive(bool enable);
 
 private:
+    friend class TcpListen;
+
     TcpConnect(SocketTCP&& sock);
 
 private:

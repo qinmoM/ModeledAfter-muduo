@@ -23,6 +23,8 @@ TcpConnect TcpConnect::connectNonBlockOrDie(const InetAddr &serverAddr)
 
 TcpConnect::TcpConnect() : sockfd_() { }
 
+TcpConnect::TcpConnect(SocketTCP&& sock) : sockfd_(std::move(sock)) { }
+
 TcpConnect::~TcpConnect() { }
 
 
@@ -72,8 +74,6 @@ bool TcpConnect::setKeepAlive(bool enable)
 {
     return sockfd_.setKeepAlive(enable);
 }
-
-TcpConnect::TcpConnect(SocketTCP&& sock) : sockfd_(std::move(sock)) { }
 
 } // namespace net
 } // namespace qinmo

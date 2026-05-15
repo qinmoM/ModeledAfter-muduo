@@ -1,5 +1,4 @@
 #include "qinmo/net/InetAddr.h"
-#include <stdexcept>
 
 /// @namespace qinmo::net
 namespace qinmo::net
