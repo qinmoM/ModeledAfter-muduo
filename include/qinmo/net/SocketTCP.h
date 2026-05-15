@@ -27,6 +27,7 @@ public:
     /// @note the addr only use protocol, you must bind after created
     static SocketTCP createRaw(const InetAddr& addr, int flags = 0);
     /// @brief equal to createRaw(InetAddr(), SOCK_NONBLOCK | SOCK_CLOEXEC)
+    /// @note better to check whether the returned value is valid: call isValid()
     static SocketTCP createNonBlockOrDie(const InetAddr& addr);
     /// @brief attach an existing socket
     /// @param fd file descriptor

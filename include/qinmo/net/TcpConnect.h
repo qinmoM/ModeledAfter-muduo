@@ -22,6 +22,7 @@ public:
     /// @note better to check whether the returned value is valid : Call isValid()
     static TcpConnect connectRaw(const InetAddr& serverAddr, int flags = 0);
     /// @brief equal to connectRaw(InetAddr(), SOCK_NONBLOCK | SOCK_CLOEXEC)
+    /// @note better to check whether the returned value is valid: call isValid()
     static TcpConnect connectNonBlockOrDie(const InetAddr& serverAddr);
 
 public:
