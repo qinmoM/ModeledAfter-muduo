@@ -24,4 +24,4 @@ void print(Args&&... args)
     std::cout << concat(args...);
 }
 
-}
+} // namespace qinmo

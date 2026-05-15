@@ -58,5 +58,5 @@ void EventLoopThread::threadFunc()
     }
 }
 
-}
-}
+} // namespace net
+} // namespace qinmo

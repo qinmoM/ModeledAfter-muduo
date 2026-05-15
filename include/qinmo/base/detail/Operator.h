@@ -41,5 +41,4 @@ struct comp_equal
 };
 
 } // namespace detail
-
 } // namespace qinmo

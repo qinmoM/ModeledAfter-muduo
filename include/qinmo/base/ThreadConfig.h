@@ -23,4 +23,4 @@ ThreadIDType getTid();
 uint32_t getTid32();
 
 } // namespace detail
-} // qinmo
+} // namespace qinmo

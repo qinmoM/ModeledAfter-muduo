@@ -56,5 +56,5 @@ protected:
 
 };
 
-}
-}
+} // namespace net
+} // namespace qinmo

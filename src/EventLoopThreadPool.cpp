@@ -51,5 +51,5 @@ EventLoop* EventLoopThreadPool::getNextLoop()
     return loops_[next_++ % loops_.size()];
 }
 
-}
-}
+} // namespace net
+} // namespace qinmo
