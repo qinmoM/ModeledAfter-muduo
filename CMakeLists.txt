@@ -7,3 +7,5 @@ aux_source_directory(${PROJECT_SOURCE_DIR}/src SRCLIST)
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
 add_executable(${PROJECT_NAME} ${SRCLIST})
+
+target_compile_definitions(${PROJECT_NAME} PRIVATE PATH_LOGS="../logs/logger.log")

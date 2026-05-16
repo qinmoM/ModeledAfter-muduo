@@ -10,12 +10,16 @@ namespace qinmo
 {
 
 /// @note the written file
-constexpr const char* loggerPath = "../logs/logger.log";
+#ifdef PATH_LOGS
+constexpr const char* loggerPath = PATH_LOGS;
+#elif
+constexpr const char* loggerPath = "logs/logger.log";
+#endif
 
 /// @note
 /// if macro is defined, logs of the level will be written into the log file
 /// if not needed, simply comment out the macro
-// #define ENABLE_TRACE
+#define ENABLE_TRACE
 #define ENABLE_DEBUG
 #define ENABLE_INFO
 #define ENABLE_WARN
