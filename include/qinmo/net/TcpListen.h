@@ -52,7 +52,11 @@ public:
     bool bind(const InetAddr& addr);
     /// @brief listen client socket
     bool listen(int num = 128);
+    /// @return a new SocketTCP object
+    /// @note must check whether InetAddr and SocketTCP is invalid
     TcpConnect accept(InetAddr& addr, int flags = 0);
+    /// @brief equal to accept(addr, SOCK_NONBLOCK | SOCK_CLOEXEC)
+    TcpConnect acceptNonBlockOrDie(InetAddr& addr);
     /// @note isValid function return false After call close
     bool close();
 

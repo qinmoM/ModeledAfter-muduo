@@ -99,6 +99,11 @@ TcpConnect TcpListen::accept(InetAddr& addr, int flags)
     return TcpConnect(sock_.accept(addr, flags));
 }
 
+TcpConnect TcpListen::acceptNonBlockOrDie(InetAddr &addr)
+{
+    return accept(addr, SOCK_NONBLOCK | SOCK_CLOEXEC);
+}
+
 bool TcpListen::close()
 {
     return sock_.close();

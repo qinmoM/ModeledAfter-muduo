@@ -64,11 +64,10 @@ public:
     /// @brief listen client socket
     bool listen(int num = 128);
     /// @return a new SocketTCP object
-    /// @note
-    /// Thought getPeerAddr obtain address if you input nullptr
-    ///
-    /// must check whether InetAddr and SocketTCP is invalid
+    /// @note must check whether InetAddr and SocketTCP is invalid
     SocketTCP accept(InetAddr& addr, int flags = 0);
+    /// @brief equal to accept(addr, SOCK_NONBLOCK | SOCK_CLOEXEC)
+    SocketTCP acceptNonBlockOrDie(InetAddr& addr);
     /// @brief connect server
     /// @param addr server address
     bool connect(const InetAddr& addr);

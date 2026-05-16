@@ -116,7 +116,12 @@ SocketTCP SocketTCP::accept(InetAddr& addr, int flags)
     return SocketTCP::attach(sockfd);
 }
 
-bool SocketTCP::connect(const InetAddr& addr)
+SocketTCP SocketTCP::acceptNonBlockOrDie(InetAddr &addr)
+{
+    return accept(addr, SOCK_NONBLOCK | SOCK_CLOEXEC);
+}
+
+bool SocketTCP::connect(const InetAddr &addr)
 {
     if (-1 == sockfd_ || !detail::connect(sockfd_, addr.getSockaddr()))
         return false;
