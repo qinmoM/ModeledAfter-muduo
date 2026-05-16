@@ -66,7 +66,7 @@ private:
     TcpConnect(SocketTCP&& sock);
 
 private:
-    SocketTCP sockfd_;
+    SocketTCP sock_;
 
 };
 } // namespace net

@@ -21,58 +21,58 @@ TcpConnect TcpConnect::connectNonBlockOrDie(const InetAddr &serverAddr)
     return TcpConnect::connectRaw(serverAddr, SOCK_NONBLOCK | SOCK_CLOEXEC);
 }
 
-TcpConnect::TcpConnect() : sockfd_() { }
+TcpConnect::TcpConnect() : sock_() { }
 
-TcpConnect::TcpConnect(SocketTCP&& sock) : sockfd_(std::move(sock)) { }
+TcpConnect::TcpConnect(SocketTCP&& sock) : sock_(std::move(sock)) { }
 
 TcpConnect::~TcpConnect() { }
 
 
 bool TcpConnect::isValid() const
 {
-    return sockfd_.isValid();
+    return sock_.isValid();
 }
 
 int TcpConnect::getfd() const
 {
-    return sockfd_.getfd();
+    return sock_.getfd();
 }
 
 InetAddr TcpConnect::getLocalAddr() const
 {
-    return sockfd_.getLocalAddr();
+    return sock_.getLocalAddr();
 }
 
 InetAddr TcpConnect::getPeerAddr() const
 {
-    return sockfd_.getPeerAddr();
+    return sock_.getPeerAddr();
 }
 
 
 ssize_t TcpConnect::recv(char *buf, size_t len)
 {
-    return sockfd_.recv(buf, len);
+    return sock_.recv(buf, len);
 }
 
 ssize_t TcpConnect::send(const char *buf, size_t len)
 {
-    return sockfd_.send(buf, len);
+    return sock_.send(buf, len);
 }
 
 bool TcpConnect::close()
 {
-    return sockfd_.close();
+    return sock_.close();
 }
 
 
 bool TcpConnect::setTcpNoDelay(bool enable)
 {
-    return sockfd_.setTcpNoDelay(enable);
+    return sock_.setTcpNoDelay(enable);
 }
 
 bool TcpConnect::setKeepAlive(bool enable)
 {
-    return sockfd_.setKeepAlive(enable);
+    return sock_.setKeepAlive(enable);
 }
 
 } // namespace net
