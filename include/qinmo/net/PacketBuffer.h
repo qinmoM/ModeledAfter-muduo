@@ -32,37 +32,38 @@ public:
 
     /// @brief return protocol header value in host-endian by offset and size
     /// @param offset value Local at the offset from the start
-    uint8_t headGet8(uint8_t offset) const;
-    uint16_t headGet16(uint8_t offset) const;
-    uint32_t headGet32(uint8_t offset) const;
-    uint64_t headGet64(uint8_t offset) const;
-    const qinmo::StringView headGetString(uint8_t offset, uint8_t len) const;
-    const qinmo::StringView headGetAll() const;
+    /// @param target write into target
+    bool headGet8(uint8_t offset, uint8_t& target) const;
+    bool headGet16(uint8_t offset, uint16_t& target) const;
+    bool headGet32(uint8_t offset, uint32_t& target) const;
+    bool headGet64(uint8_t offset, uint64_t& target) const;
+    bool headGetString(uint8_t offset, uint8_t len, std::string& str) const;
+    bool headGetAll(std::string& str) const;
 
     /// @brief set value in net-endian at the give offset
     /// @param offset value Local at the offset from the start
-    void headSet8(uint8_t offset, uint8_t n) const;
-    void headSet16(uint8_t offset, uint16_t n) const;
-    void headSet32(uint8_t offset, uint32_t n) const;
-    void headSet64(uint8_t offset, uint64_t n) const;
-    void headSetString(uint8_t offset, const char* str, uint8_t len) const;
+    bool headSet8(uint8_t offset, uint8_t n);
+    bool headSet16(uint8_t offset, uint16_t n);
+    bool headSet32(uint8_t offset, uint32_t n);
+    bool headSet64(uint8_t offset, uint64_t n);
+    bool headSetString(uint8_t offset, const std::string& str);
 
 
     /// @brief get value in host-endian without advancing the pointer
-    int8_t peek8() const;
-    int16_t peek16() const;
-    int32_t peek32() const;
-    int64_t peek64() const;
-    std::string peekString(std::size_t len) const;
-    const qinmo::StringView peekAll() const;
+    bool peek8(int8_t& target) const;
+    bool peek16(int16_t& target) const;
+    bool peek32(int32_t& target) const;
+    bool peek64(int64_t& target) const;
+    bool peekString(std::size_t len, std::string& str) const;
+    bool peekAll(std::string& str) const;
 
     /// @brief get value in host-endian within advancing the pointer
-    int8_t retrieve8();
-    int16_t retrieve16();
-    int32_t retrieve32();
-    int64_t retrieve64();
-    std::string retrieveString(std::size_t len);
-    std::string retrieveAll();
+    bool retrieve8(int8_t& target);
+    bool retrieve16(int16_t& target);
+    bool retrieve32(int32_t& target);
+    bool retrieve64(int64_t& target);
+    bool retrieveString(std::size_t len, std::string& str);
+    bool retrieveAll(std::string& str);
 
     /// @brief append value in net-endian at end of buffer
     void append(const char* data, std::size_t len);
@@ -70,7 +71,7 @@ public:
     void append16(int16_t n);
     void append32(int32_t n);
     void append64(int64_t n);
-    void appendString(qinmo::StringView str);
+    void appendString(const std::string& str);
 
     /// @brief read / write data between file desriptor and buffer
     /// @param savedErrno error code
