@@ -323,22 +323,72 @@ const char* PacketBuffer::begin() const
 
 
 
-ssize_t PacketBuffer::readFd(int fd, int& savedErrno, std::size_t chunkSize)
+bool PacketBuffer::readFd(int fd, ssize_t& receiveLen, int& savedErrno, std::size_t chunkSize)
 {
+    receiveLen = 0;
+    savedErrno = 0;
     while (true)
     {
         ensureWrite(chunkSize);
         ssize_t len = qinmo::detail::read(fd, begin() + wIndex_, getWritableSize());
-        if (len < 0)
+        if (len > 0)
         {
-            ;
+            receiveLen += len;
+            wIndex_ += len;
+        }
+        else if (len == 0)
+        {
+            savedErrno = 0;
+            return false;
+        }
+        else
+        {
+            savedErrno = errno;
+            return !disconnectError(savedErrno);
         }
     }
 }
 
-ssize_t PacketBuffer::writeFd(int fd, int& savedErrno)
+bool PacketBuffer::writeFd(int fd, ssize_t& sendLen, int& savedErrno)
 {
-    ;
+    sendLen = 0;
+    savedErrno = 0;
+    while (true)
+    {
+        if (0 == getReadableSize())
+            return true;
+
+        ssize_t len = qinmo::detail::write(fd, begin() + rIndex_, getReadableSize());
+        if (len > 0)
+        {
+            retrieve(len);
+            sendLen += len;
+            continue;
+        }
+        savedErrno = errno;
+
+        if (savedErrno == EINTR)
+            continue;
+
+        if (savedErrno == EAGAIN || savedErrno == EWOULDBLOCK)
+            return true;
+
+        return false;
+    }
+}
+
+bool PacketBuffer::disconnectError(int err)
+{
+    switch (err)
+    {
+    case ECONNRESET:
+    case EPIPE:
+    case ENOTCONN:
+    case ESHUTDOWN:
+    case ETIMEDOUT:
+        return true;
+    }
+    return false;
 }
 
 } // namespace net
