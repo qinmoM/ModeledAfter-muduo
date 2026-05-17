@@ -9,6 +9,8 @@ namespace net
 
 Channel::Channel(EventLoop* eventLoop, int fd)
     : loop_(eventLoop)
+    , tie_()
+    , tied_(false)
     , fd_(fd)
     , isInLoop_(false)
 { }
@@ -23,7 +25,13 @@ poller::EventsType Channel::events() const
     return events_;
 }
 
-void Channel::set_revents(poller::EventsType revt)
+void Channel::tie(const std::shared_ptr<void>& obj)
+{
+    tied_ = true;
+    tie_ = obj;
+}
+
+void Channel::setRevents(poller::EventsType revt)
 {
     revents_ = revt;
 }
@@ -115,6 +123,10 @@ bool Channel::isAll() const
 
 void Channel::handle(Timestamp timestamp)
 {
+    auto guard = tie_.lock();
+    if (tied_ && nullptr == guard)
+        return;
+
     isInLoop_.store(true);
 
     if (closeEvent_ && (  (revents_ & (EPOLLHUP))  &&  !(revents_ & (EPOLLIN))  ) )

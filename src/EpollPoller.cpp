@@ -32,7 +32,7 @@ Timestamp EpollPoller::poll(int timeoutMs, ChannelList& list)
         for (int i = 0; i < len; ++i)
         {
             list.push_back(static_cast<Channel*>(eventsbuf_[i].data.ptr));
-            list.back()->set_revents(eventsbuf_[i].events);
+            list.back()->setRevents(eventsbuf_[i].events);
         }
 
         if (len == size)

@@ -47,8 +47,11 @@ public:
     bool isInLoop() const;
     EventLoop* eventLoop() const;
 
+    /// @brief bind a shared_ptr, Skip callback if ptr has been released
+    void tie(const std::shared_ptr<void>& obj);
+
     /// @brief only used for returned events in Poller
-    void set_revents(poller::EventsType revt);
+    void setRevents(poller::EventsType revt);
     /// @brief remove current file descriptor events in EventLoop
     void remove();
 
@@ -84,7 +87,8 @@ private:
     EventLoop* loop_;
     std::atomic<bool> isInLoop_;
 
-    // std::weak_ptr<void> tie_;
+    std::weak_ptr<void> tie_;
+    bool tied_;
 
     int fd_;
     poller::EventsType events_;
