@@ -144,7 +144,7 @@ bool PacketBuffer::peek8(int8_t& target) const
     if (getReadableSize() < sizeof(target))
         return false;
 
-    memcpy(&target, &buf_[headerSize_ + rIndex_], sizeof(target));
+    memcpy(&target, &buf_[rIndex_], sizeof(target));
     return true;
 }
 
@@ -153,7 +153,7 @@ bool PacketBuffer::peek16(int16_t& target) const
     if (getReadableSize() < sizeof(target))
         return false;
 
-    memcpy(&target, &buf_[headerSize_ + rIndex_], sizeof(target));
+    memcpy(&target, &buf_[rIndex_], sizeof(target));
     target = detail::netToHost16(target);
     return true;
 }
@@ -163,7 +163,7 @@ bool PacketBuffer::peek32(int32_t& target) const
     if (getReadableSize() < sizeof(target))
         return false;
 
-    memcpy(&target, &buf_[headerSize_ + rIndex_], sizeof(target));
+    memcpy(&target, &buf_[rIndex_], sizeof(target));
     target = detail::netToHost32(target);
     return true;
 }
@@ -173,7 +173,7 @@ bool PacketBuffer::peek64(int64_t& target) const
     if (getReadableSize() < sizeof(target))
         return false;
 
-    memcpy(&target, &buf_[headerSize_ + rIndex_], sizeof(target));
+    memcpy(&target, &buf_[rIndex_], sizeof(target));
     target = detail::netToHost64(target);
     return true;
 }
@@ -183,14 +183,14 @@ bool PacketBuffer::peekString(std::size_t len, std::string& str) const
     if (getReadableSize() < len)
         return false;
 
-    const char* dataPtr = &buf_[headerSize_ + rIndex_];
+    const char* dataPtr = &buf_[rIndex_];
     str.assign(dataPtr, dataPtr + len);
     return true;
 }
 
 bool PacketBuffer::peekAll(std::string& str) const
 {
-    const char* dataPtr = &buf_[headerSize_ + rIndex_];
+    const char* dataPtr = &buf_[rIndex_];
     str.assign(dataPtr, dataPtr + getReadableSize());
     return true;
 }
@@ -308,7 +308,7 @@ void PacketBuffer::ensureWrite(std::size_t len)
     memcpy(begin() + headerSize_, begin() + rIndex_, getReadableSize());
     std::size_t temp = getReadableSize();
     rIndex_ = headerSize_;
-    wIndex_ = temp + rIndex_;
+    wIndex_ = temp + headerSize_;
 }
 
 char* PacketBuffer::begin()
@@ -321,6 +321,25 @@ const char* PacketBuffer::begin() const
     return &buf_[0];
 }
 
+
+
+ssize_t PacketBuffer::readFd(int fd, int& savedErrno, std::size_t chunkSize)
+{
+    while (true)
+    {
+        ensureWrite(chunkSize);
+        ssize_t len = qinmo::detail::read(fd, begin() + wIndex_, getWritableSize());
+        if (len < 0)
+        {
+            ;
+        }
+    }
+}
+
+ssize_t PacketBuffer::writeFd(int fd, int& savedErrno)
+{
+    ;
+}
 
 } // namespace net
 } // namespace qinmo

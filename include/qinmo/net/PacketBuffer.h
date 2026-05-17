@@ -18,6 +18,8 @@ public:
     /// @param headerSize application-layer protocol header length
     /// @param bodySize message length
     /// @note if headerSize is 0, it is a normal buffer
+    /// @note in receive buffer, headerSize **must** is 0.
+    ///       or you can fill protocol header manually if you want to keep it
     explicit PacketBuffer(uint8_t headerSize, std::size_t bodySize = 1024);
     ~PacketBuffer();
 
@@ -75,8 +77,9 @@ public:
 
     /// @brief read / write data between file desriptor and buffer
     /// @param savedErrno error code
+    /// @param chunkSize maximum bytes to read per system call, recommend close to size of net package
     /// @note auto resize
-    ssize_t readFd(int fd, int& savedErrno);
+    ssize_t readFd(int fd, int& savedErrno, std::size_t chunkSize = 4096);
     ssize_t writeFd(int fd, int& savedErrno);
 
 private:
