@@ -76,15 +76,17 @@ public:
     void appendString(const std::string& str);
 
     /// @brief read / write data between file desriptor and buffer
-    /// @param savedErrno error code
+    /// @param writeLen use to return number of write
+    /// @param savedErrno system error code
     /// @param chunkSize maximum bytes to read per system call, recommend close to size of net package
-    /// @note auto resize
-    ssize_t readFd(int fd, int& savedErrno, std::size_t chunkSize = 4096);
-    ssize_t writeFd(int fd, int& savedErrno);
+    /// @return true if connecting, return false if peer Close socket or irrecoverable error
+    bool readFd(int fd, ssize_t& receiveLen, int& savedErrno, std::size_t chunkSize = 4096);
+    bool writeFd(int fd, ssize_t& sendLen, int& savedErrno);
 
 private:
     void retrieve(std::size_t len);
     void ensureWrite(std::size_t len);
+    bool disconnectError(int err);
 
     char* begin();
     const char* begin() const;
