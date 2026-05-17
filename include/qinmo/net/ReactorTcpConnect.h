@@ -2,6 +2,7 @@
 
 #include "TcpConnect.h"
 #include "EventLoopThreadPool.h"
+#include "PacketBuffer.h"
 #include <memory>
 
 /// @namespace qinmo
@@ -24,7 +25,7 @@ using CloseFunc = std::function<void(const RTcpConnPtr&)>;
 /// @brief send complete callback
 using WriteCompleteFunc = std::function<void(const RTcpConnPtr&)>;
 /// @brief new message callback
-using MessageFunc = std::function<void(const RTcpConnPtr&, Buffer?, Timestamp)>;
+using MessageFunc = std::function<void(const RTcpConnPtr&, PacketBuffer&, Timestamp)>;
 /// @brief send buffer full callback
 using HighWaterMarkFunc = std::function<void(const RTcpConnPtr&, std::size_t)>;
 
@@ -72,8 +73,8 @@ private:
     HighWaterMarkFunc highWaterMarkFunc_;
     std::size_t waterMark_;
 
-    Buffer inputBuffer_;
-    Buffer outputBuffer_;
+    PacketBuffer inputBuffer_;
+    PacketBuffer outputBuffer_;
 
 };
 
