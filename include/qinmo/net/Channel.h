@@ -22,6 +22,7 @@ using ChannelList = std::vector<Channel*>;
 /**
  * @brief file descriptor and event encapsulation class
  * @note only used to observing file descriptor, do not auto release
+ * @note because one loop a per thread, do not call disableAll in destructor
  */
 class Channel
 {
