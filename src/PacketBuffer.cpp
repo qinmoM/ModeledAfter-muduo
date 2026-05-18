@@ -13,6 +13,7 @@ PacketBuffer::PacketBuffer(uint8_t headerSize, std::size_t bodySize)
     , buf_(headerSize + bodySize)
     , rIndex_(headerSize)
     , wIndex_(headerSize)
+    , hsIndex_(0)
 { }
 
 PacketBuffer::~PacketBuffer() { }
@@ -34,7 +35,7 @@ std::size_t PacketBuffer::getWritableSize() const
 
 
 
-bool PacketBuffer::headGet8(uint8_t offset, uint8_t& target) const
+bool PacketBuffer::headGet8(uint8_t offset, int8_t& target) const
 {
     if (offset + sizeof(target) > headerSize_)
         return false;
@@ -43,7 +44,7 @@ bool PacketBuffer::headGet8(uint8_t offset, uint8_t& target) const
     return true;
 }
 
-bool PacketBuffer::headGet16(uint8_t offset, uint16_t& target) const
+bool PacketBuffer::headGet16(uint8_t offset, int16_t& target) const
 {
     if (offset + sizeof(target) > headerSize_)
         return false;
@@ -53,7 +54,7 @@ bool PacketBuffer::headGet16(uint8_t offset, uint16_t& target) const
     return true;
 }
 
-bool PacketBuffer::headGet32(uint8_t offset, uint32_t& target) const
+bool PacketBuffer::headGet32(uint8_t offset, int32_t& target) const
 {
     if (offset + sizeof(target) > headerSize_)
         return false;
@@ -63,7 +64,7 @@ bool PacketBuffer::headGet32(uint8_t offset, uint32_t& target) const
     return true;
 }
 
-bool PacketBuffer::headGet64(uint8_t offset, uint64_t& target) const
+bool PacketBuffer::headGet64(uint8_t offset, int64_t& target) const
 {
     if (offset + sizeof(target) > headerSize_)
         return false;
@@ -89,7 +90,7 @@ bool PacketBuffer::headGetAll(std::string& str) const
 }
 
 
-bool PacketBuffer::headSet8(uint8_t offset, uint8_t n)
+bool PacketBuffer::headSet8(uint8_t offset, int8_t n)
 {
     if (offset + sizeof(n) > headerSize_)
         return false;
@@ -98,7 +99,7 @@ bool PacketBuffer::headSet8(uint8_t offset, uint8_t n)
     return true;
 }
 
-bool PacketBuffer::headSet16(uint8_t offset, uint16_t n)
+bool PacketBuffer::headSet16(uint8_t offset, int16_t n)
 {
     if (offset + sizeof(n) > headerSize_)
         return false;
@@ -108,7 +109,7 @@ bool PacketBuffer::headSet16(uint8_t offset, uint16_t n)
     return true;
 }
 
-bool PacketBuffer::headSet32(uint8_t offset, uint32_t n)
+bool PacketBuffer::headSet32(uint8_t offset, int32_t n)
 {
     if (offset + sizeof(n) > headerSize_)
         return false;
@@ -118,7 +119,7 @@ bool PacketBuffer::headSet32(uint8_t offset, uint32_t n)
     return true;
 }
 
-bool PacketBuffer::headSet64(uint8_t offset, uint64_t n)
+bool PacketBuffer::headSet64(uint8_t offset, int64_t n)
 {
     if (offset + sizeof(n) > headerSize_)
         return false;
@@ -323,73 +324,126 @@ const char* PacketBuffer::begin() const
 
 
 
-bool PacketBuffer::readFd(int fd, ssize_t& receiveLen, int& savedErrno, std::size_t chunkSize)
-{
-    receiveLen = 0;
-    savedErrno = 0;
-    while (true)
-    {
-        ensureWrite(chunkSize);
-        ssize_t len = qinmo::detail::read(fd, begin() + wIndex_, getWritableSize());
-        if (len > 0)
-        {
-            receiveLen += len;
-            wIndex_ += len;
-        }
-        else if (len == 0)
-        {
-            savedErrno = 0;
-            return false;
-        }
-        else
-        {
-            savedErrno = errno;
-            return !disconnectError(savedErrno);
-        }
-    }
-}
+// bool PacketBuffer::readFd(int fd, ssize_t& receiveLen, int& savedErrno, std::size_t chunkSize)
+// {
+//     receiveLen = 0;
+//     savedErrno = 0;
+//     while (true)
+//     {
+//         ensureWrite(chunkSize);
+//         ssize_t len = qinmo::detail::read(fd, begin() + wIndex_, getWritableSize());
+//         if (len > 0)
+//         {
+//             receiveLen += len;
+//             wIndex_ += len;
+//         }
+//         else if (len == 0)
+//         {
+//             savedErrno = 0;
+//             return false;
+//         }
+//         else
+//         {
+//             savedErrno = errno;
+//             return !disconnectError(savedErrno);
+//         }
+//     }
+// }
 
-bool PacketBuffer::writeFd(int fd, ssize_t& sendLen, int& savedErrno)
-{
-    sendLen = 0;
-    savedErrno = 0;
-    while (true)
-    {
-        if (0 == getReadableSize())
-            return true;
+// bool PacketBuffer::writeFd(int fd, ssize_t& sendLen, int& savedErrno)
+// {
+//     sendLen = 0;
+//     savedErrno = 0;
+//     while (true)
+//     {
+//         if (0 == getReadableSize())
+//             return true;
+//
+//         ssize_t len = qinmo::detail::write(fd, begin() + rIndex_, getReadableSize());
+//         if (len > 0)
+//         {
+//             retrieve(len);
+//             sendLen += len;
+//             continue;
+//         }
+//         savedErrno = errno;
+//
+//         if (savedErrno == EINTR)
+//             continue;
+//
+//         if (savedErrno == EAGAIN || savedErrno == EWOULDBLOCK)
+//             return true;
+//
+//         return false;
+//     }
+// }
 
-        ssize_t len = qinmo::detail::write(fd, begin() + rIndex_, getReadableSize());
-        if (len > 0)
-        {
-            retrieve(len);
-            sendLen += len;
-            continue;
-        }
+ssize_t PacketBuffer::readFd(int fd, int& savedErrno, std::size_t chunkSize)
+{
+    savedErrno = 0;
+    ensureWrite(chunkSize);
+    ssize_t len = qinmo::detail::read(fd, begin() + wIndex_, getWritableSize());
+
+    if (len >= 0)
+        wIndex_ += len;
+    else
         savedErrno = errno;
 
-        if (savedErrno == EINTR)
-            continue;
-
-        if (savedErrno == EAGAIN || savedErrno == EWOULDBLOCK)
-            return true;
-
-        return false;
-    }
+    return len;
 }
 
-bool PacketBuffer::disconnectError(int err)
+ssize_t PacketBuffer::writeFd(int fd, int& savedErrno)
 {
-    switch (err)
+    int sendLen = 0;
+    savedErrno = 0;
+    // header
+    while (hsIndex_ < headerSize_)
     {
-    case ECONNRESET:
-    case EPIPE:
-    case ENOTCONN:
-    case ESHUTDOWN:
-    case ETIMEDOUT:
-        return true;
+        ssize_t len = qinmo::detail::write(fd, begin() + hsIndex_, headerSize_ - hsIndex_);
+        if (len < 0)
+        {
+            savedErrno = errno;
+            if (savedErrno == EINTR)
+                continue;
+            else
+                return sendLen;
+        }
+        hsIndex_ += len;
+        sendLen += len;
     }
-    return false;
+
+    // body
+    while (0 != getReadableSize())
+    {
+        ssize_t len = qinmo::detail::write(fd, begin() + rIndex_, getReadableSize());
+        if (len < 0)
+        {
+            savedErrno = errno;
+            if (savedErrno == EINTR)
+                continue;
+            else
+                break;
+        }
+        retrieve(len);
+        sendLen += len;
+    }
+
+    return sendLen;
 }
+
+// bool PacketBuffer::disconnectError(int err)
+// {
+//     switch (err)
+//     {
+//     case ECONNRESET:
+//     case EPIPE:
+//     case ENOTCONN:
+//     case ESHUTDOWN:
+//     case ETIMEDOUT:
+//         return true;
+//     }
+//     return false;
+// }
 
 } // namespace net
 } // namespace qinmo
