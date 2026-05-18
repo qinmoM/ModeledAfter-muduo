@@ -35,19 +35,19 @@ public:
     /// @brief return protocol header value in host-endian by offset and size
     /// @param offset value Local at the offset from the start
     /// @param target write into target
-    bool headGet8(uint8_t offset, uint8_t& target) const;
-    bool headGet16(uint8_t offset, uint16_t& target) const;
-    bool headGet32(uint8_t offset, uint32_t& target) const;
-    bool headGet64(uint8_t offset, uint64_t& target) const;
+    bool headGet8(uint8_t offset, int8_t& target) const;
+    bool headGet16(uint8_t offset, int16_t& target) const;
+    bool headGet32(uint8_t offset, int32_t& target) const;
+    bool headGet64(uint8_t offset, int64_t& target) const;
     bool headGetString(uint8_t offset, uint8_t len, std::string& str) const;
     bool headGetAll(std::string& str) const;
 
     /// @brief set value in net-endian at the give offset
     /// @param offset value Local at the offset from the start
-    bool headSet8(uint8_t offset, uint8_t n);
-    bool headSet16(uint8_t offset, uint16_t n);
-    bool headSet32(uint8_t offset, uint32_t n);
-    bool headSet64(uint8_t offset, uint64_t n);
+    bool headSet8(uint8_t offset, int8_t n);
+    bool headSet16(uint8_t offset, int16_t n);
+    bool headSet32(uint8_t offset, int32_t n);
+    bool headSet64(uint8_t offset, int64_t n);
     bool headSetString(uint8_t offset, const std::string& str);
 
 
@@ -75,18 +75,29 @@ public:
     void append64(int64_t n);
     void appendString(const std::string& str);
 
-    /// @brief read / write data between file desriptor and buffer
-    /// @param writeLen use to return number of write
-    /// @param savedErrno system error code
-    /// @param chunkSize maximum bytes to read per system call, recommend close to size of net package
-    /// @return true if connecting, return false if peer Close socket or irrecoverable error
-    bool readFd(int fd, ssize_t& receiveLen, int& savedErrno, std::size_t chunkSize = 4096);
-    bool writeFd(int fd, ssize_t& sendLen, int& savedErrno);
+    // /// @brief read / write data between file descriptor and buffer
+    // /// @param writeLen use to return number of write
+    // /// @param savedErrno system error code
+    // /// @param chunkSize maximum bytes to read per system call, recommend close to size of net package
+    // /// @return true if connecting, return false if peer Close socket or irrecoverable error
+    // bool readFd(int fd, ssize_t& receiveLen, int& savedErrno, std::size_t chunkSize = 4096);
+    // bool writeFd(int fd, ssize_t& sendLen, int& savedErrno);
+
+    /// @brief read data from file descriptor into buffer once
+    /// @param savedErrno errno code
+    /// @param chunkSize size that you want to write, only close to size of package
+    /// @return size of written to buffer this time
+    ssize_t readFd(int fd, int& savedErrno, std::size_t chunkSize = 4096);
+    /// @brief read data from file descriptor into buffer once
+    /// @param savedErrno errno code
+    /// @return size of written from buffer to fd this time
+    /// @note if savedErrno is EAGAIN or EWOULDBLOCK, this is not real error
+    ssize_t writeFd(int fd, int& savedErrno);
 
 private:
     void retrieve(std::size_t len);
     void ensureWrite(std::size_t len);
-    bool disconnectError(int err);
+    // bool disconnectError(int err);
 
     char* begin();
     const char* begin() const;
@@ -97,6 +108,7 @@ private:
     std::size_t wIndex_;
 
     const uint8_t headerSize_;
+    uint8_t hsIndex_;
 
 };
 
