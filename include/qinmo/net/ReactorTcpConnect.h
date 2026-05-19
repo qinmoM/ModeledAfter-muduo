@@ -18,9 +18,9 @@ class ReactorTcpConnect;
 
 using RTcpConnPtr = std::shared_ptr<ReactorTcpConnect>;
 
-/// @brief connection has changed callback
+/// @brief connecting callback
 using ConnectFunc = std::function<void(const RTcpConnPtr&)>;
-/// @brief connection has changed callback
+/// @brief disconnection callback
 using DisconnectFunc = std::function<void(const RTcpConnPtr&)>;
 /// @brief send complete callback
 using WriteCompleteFunc = std::function<void(const RTcpConnPtr&)>;
@@ -50,7 +50,14 @@ public:
     ReactorTcpConnect& operator=(ReactorTcpConnect&&) = delete;
 
 public:
-    ;
+    void setConnectFunc(const ConnectFunc& f);
+    void setDisconnectFunc(const DisconnectFunc& f);
+    void setWriteCompleteFunc(const WriteCompleteFunc& f);
+    void setMessageFunc(const MessageFunc& f);
+    void setHighWaterMarkFunc(const HighWaterMarkFunc& f);
+
+    /// @warning internal use only
+    void setCloseFunc(const CloseFunc& f);
 
 private:
     enum class RTcpConnState : char

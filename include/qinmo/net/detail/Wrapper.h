@@ -115,6 +115,7 @@ inline ssize_t recvfrom(int sockfd, void* buf, size_t count, sockaddr& addr, uns
 
 inline bool isAddrReuse(int sockfd) { int opt = 0; socklen_t len = sizeof(opt); return 0 == ::getsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &opt, &len) && 1 == opt; }
 
+inline int getSockOpt(int sockfd, int level, int optname, void* opt, socklen_t& len) { ::getsockopt(sockfd, level, optname, opt, &len); }
 inline bool setAddrReuse(int sockfd, bool enable) { int opt = enable ? 1 : 0; return 0 == ::setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)); }
 inline bool setPortReuse(int sockfd, bool enable) { int opt = enable ? 1 : 0; return 0 == ::setsockopt(sockfd, SOL_SOCKET, SO_REUSEPORT, &opt, sizeof(opt)); }
 inline bool setTcpNoDelay(int sockfd, bool enable) { int opt = enable ? 1 : 0; return 0 == ::setsockopt(sockfd, IPPROTO_TCP, TCP_NODELAY, &opt, sizeof(opt)); }
