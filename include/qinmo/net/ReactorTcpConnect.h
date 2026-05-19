@@ -31,7 +31,7 @@ using HighWaterMarkFunc = std::function<void(const RTcpConnPtr&, std::size_t)>;
 
 /// @brief close callback
 /// @warning for intarnal use only, do NOT use it from outside the library
-using CloseFunc = std::function<void(const RTcpConnPtr&)>;
+using CloseFunc = std::function<void()>;
 
 
 
@@ -40,7 +40,7 @@ class ReactorTcpConnect
     : public std::enable_shared_from_this<ReactorTcpConnect>
 {
 public:
-    ReactorTcpConnect(EventLoop* loop, TcpConnect sock, const InetAddr& localAddr, const InetAddr& peerAddr);
+    ReactorTcpConnect(EventLoop* loop, TcpConnect&& sock, const InetAddr& localAddr, const InetAddr& peerAddr);
     ~ReactorTcpConnect();
 
     ReactorTcpConnect(const ReactorTcpConnect&) = delete;
@@ -50,6 +50,9 @@ public:
     ReactorTcpConnect& operator=(ReactorTcpConnect&&) = delete;
 
 public:
+    int getfd() const;
+    EventLoop* getLoop() const;
+
     void connectEstablished();
     void connectDestroyed();
 
@@ -63,7 +66,7 @@ public:
     void setDisconnectFunc(const DisconnectFunc& f);
     void setWriteCompleteFunc(const WriteCompleteFunc& f);
     void setMessageFunc(const MessageFunc& f);
-    void setHighWaterMarkFunc(const HighWaterMarkFunc& f);
+    void setHighWaterMarkFunc(std::size_t waterMark, const HighWaterMarkFunc& f);
     /// @warning internal use only
     void setCloseFunc(const CloseFunc& f);
 
