@@ -3,7 +3,6 @@
 #include <vector>
 #include <string>
 #include <stdint.h>
-#include "../base/StringView.h"
 
 /// @namespace qinmo
 namespace qinmo
