@@ -54,6 +54,8 @@ public:
 
         std::lock_guard<std::mutex> lock(mutex_);
         ofs_ << str;
+
+        ofs_.flush();
     }
 
     /// @brief flush buffer
