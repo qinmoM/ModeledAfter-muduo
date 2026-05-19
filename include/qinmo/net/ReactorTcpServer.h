@@ -28,19 +28,29 @@ public:
     /// @note must start loop.loop()
     void start(EventLoopThread::EventLoopThreadInitFunc func = [](EventLoop *) -> void { });
 
+    void setConnectFunc(const ConnectFunc& f);
+    void setDisconnectFunc(const DisconnectFunc& f);
+    void setMessageFunc(const MessageFunc& f);
+    void setWriteCompleteFunc(const WriteCompleteFunc& f);
+
 private:
     /// @brief create a new connect, and register to loop
-    void newConnect();
+    void newConnect(Timestamp time);
     /// @brief remove connect in loop and registry
-    void removeConnect();
+    /// @note unregister in TcpServer immediately, but will not be deleted right now
+    void removeConnect(const RTcpConnPtr& conn);
 
 private:
     EventLoop* loop_;
-    std::shared_ptr<EventLoopThreadPool> threadPool_;
     std::unordered_map<int, RTcpConnPtr> rConnects_;
+    std::shared_ptr<EventLoopThreadPool> threadPool_;
+
+    ConnectFunc connect_;
+    DisconnectFunc disconnect_;
+    MessageFunc message_;
+    WriteCompleteFunc writeComplete_;
 
     Channel acceptChannel_;
-
     TcpListen sock_;
     std::atomic<bool> started_;
     std::atomic<int> numConn_;
