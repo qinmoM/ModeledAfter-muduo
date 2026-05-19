@@ -43,7 +43,7 @@ private:
 private:
     EventLoop* loop_;
     std::unordered_map<int, RTcpConnPtr> rConnects_;
-    std::shared_ptr<EventLoopThreadPool> threadPool_;
+    std::unique_ptr<EventLoopThreadPool> threadPool_;
 
     ConnectFunc connect_;
     DisconnectFunc disconnect_;
