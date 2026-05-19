@@ -33,6 +33,58 @@ ReactorTcpConnect::~ReactorTcpConnect()
     QINMO_INFO("ReactorTcpConnect disconnect : fd=", sock_.getfd(), ", state=", getStateStr().data());
 }
 
+
+void ReactorTcpConnect::connectEstablished()
+{
+    state_ = RTcpConnState::Connected;
+    channel_.tie(shared_from_this());
+    channel_.enableRead();
+
+    if (connectFunc_)
+        connectFunc_(shared_from_this());
+}
+
+void ReactorTcpConnect::connectDestroyed()
+{
+    if (RTcpConnState::Connected == state_)
+    {
+        state_ = RTcpConnState::Disconnected;
+        channel_.disableAll();
+
+        if (disconnectFunc_)
+            disconnectFunc_(shared_from_this());
+    }
+
+    channel_.remove();
+}
+
+
+void ReactorTcpConnect::setTcpNoDelay(bool enable)
+{
+    loop_->runInLoop(
+        [self = shared_from_this(), enable]() -> void
+        {
+            self->sock_.setTcpNoDelay(enable);
+        }
+    );
+}
+
+void ReactorTcpConnect::shutdown()
+{
+    if (RTcpConnState::Connected != state_)
+        return;
+
+    state_ = RTcpConnState::Disconnecting;
+    loop_->runInLoop(
+        [self = shared_from_this()]() -> void
+        {
+            if (!self->channel_.isWrite())
+                self->sock_.shutdownWrite();
+        }
+    );
+}
+
+
 void ReactorTcpConnect::setConnectFunc(const ConnectFunc &f)
 {
     connectFunc_ = f;
@@ -89,7 +141,10 @@ void ReactorTcpConnect::handleRead(Timestamp time)
     else if (0 == len)
         handleClose();
     else
-        messageFunc_(shared_from_this(), inputBuffer_, time);
+    {
+        if (messageFunc_)
+            messageFunc_(shared_from_this(), inputBuffer_, time);
+    }
 }
 
 void ReactorTcpConnect::handleWrite()
@@ -122,7 +177,7 @@ void ReactorTcpConnect::handleWrite()
         loop_->queueInLoop([self = shared_from_this()]() -> void { self->writeCompleteFunc_(self); });
 
     if (RTcpConnState::Disconnecting == state_)
-        shutdownInLoop();
+        shutdown();
 }
 
 void ReactorTcpConnect::handleClose()

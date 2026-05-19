@@ -50,12 +50,20 @@ public:
     ReactorTcpConnect& operator=(ReactorTcpConnect&&) = delete;
 
 public:
+    void connectEstablished();
+    void connectDestroyed();
+
+    void send(const std::string& str);
+    void send(qinmo::net::PacketBuffer buf);
+
+    void setTcpNoDelay(bool enable);
+    void shutdown();
+
     void setConnectFunc(const ConnectFunc& f);
     void setDisconnectFunc(const DisconnectFunc& f);
     void setWriteCompleteFunc(const WriteCompleteFunc& f);
     void setMessageFunc(const MessageFunc& f);
     void setHighWaterMarkFunc(const HighWaterMarkFunc& f);
-
     /// @warning internal use only
     void setCloseFunc(const CloseFunc& f);
 
