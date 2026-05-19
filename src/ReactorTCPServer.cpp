@@ -9,7 +9,9 @@ namespace net
 {
 
 ReactorTcpServer::ReactorTcpServer(EventLoop* loop, const InetAddr& listenAddr, unsigned int numThread, bool reusePort)
-    : sock_(TcpListen::createNonBlockOrDie(listenAddr))
+    : loop_(loop)
+    , threadPool_(new EventLoopThreadPool(loop, numThread))
+    , sock_(TcpListen::createNonBlockOrDie(listenAddr))
     , acceptChannel_(loop, sock_.getfd())
     , started_(false)
     , numConn_(0)
@@ -20,9 +22,9 @@ ReactorTcpServer::ReactorTcpServer(EventLoop* loop, const InetAddr& listenAddr, 
         std::terminate();
     }
 
-    if (sock_.setReuseAddr(true))
+    if (!sock_.setReuseAddr(true))
         QINMO_ERROR("Failed to set reuse address.");
-    if (sock_.setReusePort(reusePort))
+    if (!sock_.setReusePort(reusePort))
         QINMO_WARN("Failed to set reuse port.");
 
     if (!sock_.bind(listenAddr))
@@ -31,11 +33,13 @@ ReactorTcpServer::ReactorTcpServer(EventLoop* loop, const InetAddr& listenAddr, 
         std::terminate();
     }
 
+    QINMO_DEBUG("set listen read event");
     acceptChannel_.setReadEvent( [this](Timestamp stamp) -> void { newConnect(stamp); } );
 }
 
 ReactorTcpServer::~ReactorTcpServer()
 {
+    QINMO_INFO("ReactorTcpServer quit.");
     acceptChannel_.disableAll();
     acceptChannel_.remove();
 }
@@ -66,11 +70,11 @@ void ReactorTcpServer::start(EventLoopThread::EventLoopThreadInitFunc func)
 {
     if (started_.load()) return;
 
-    QINMO_INFO("Start TCP server");
     threadPool_->start(func);
     loop_->runInLoop(
         [this]()
         {
+            QINMO_DEBUG("start listen.");
             if (sock_.isListen())
             {
                 QINMO_WARN("Already in listen state.");
