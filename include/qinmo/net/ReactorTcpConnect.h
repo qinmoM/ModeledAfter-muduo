@@ -18,16 +18,20 @@ class ReactorTcpConnect;
 
 using RTcpConnPtr = std::shared_ptr<ReactorTcpConnect>;
 
-/// @brief new connection callback
+/// @brief connection has changed callback
 using ConnectFunc = std::function<void(const RTcpConnPtr&)>;
-/// @brief close callback
-using CloseFunc = std::function<void(const RTcpConnPtr&)>;
+/// @brief connection has changed callback
+using DisconnectFunc = std::function<void(const RTcpConnPtr&)>;
 /// @brief send complete callback
 using WriteCompleteFunc = std::function<void(const RTcpConnPtr&)>;
 /// @brief new message callback
 using MessageFunc = std::function<void(const RTcpConnPtr&, PacketBuffer&, Timestamp)>;
 /// @brief send buffer full callback
 using HighWaterMarkFunc = std::function<void(const RTcpConnPtr&, std::size_t)>;
+
+/// @brief close callback
+/// @warning for intarnal use only, do NOT use it from outside the library
+using CloseFunc = std::function<void(const RTcpConnPtr&)>;
 
 
 
@@ -36,7 +40,7 @@ class ReactorTcpConnect
     : public std::enable_shared_from_this<ReactorTcpConnect>
 {
 public:
-    ReactorTcpConnect();
+    ReactorTcpConnect(EventLoop* loop, TcpConnect sock, const InetAddr& localAddr, const InetAddr& peerAddr);
     ~ReactorTcpConnect();
 
     ReactorTcpConnect(const ReactorTcpConnect&) = delete;
@@ -56,10 +60,16 @@ private:
         Connected,
         Disconnecting
     };
+    qinmo::StringView getStateStr() const;
+
+    void handleRead(Timestamp time);
+    void handleWrite();
+    void handleClose();
+    void handleError();
 
 private:
     EventLoop* loop_;
-    std::atomic<RTcpConnPtr> state_;
+    RTcpConnState state_;
 
     TcpConnect sock_;
     Channel channel_;
@@ -67,10 +77,11 @@ private:
     InetAddr peerAddr_;
 
     ConnectFunc connectFunc_;
+    DisconnectFunc disconnectFunc_;
     MessageFunc messageFunc_;
     WriteCompleteFunc writeCompleteFunc_;
-    CloseFunc closeFunc_;
     HighWaterMarkFunc highWaterMarkFunc_;
+    CloseFunc closeFunc_;
     std::size_t waterMark_;
 
     PacketBuffer inputBuffer_;
