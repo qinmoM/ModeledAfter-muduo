@@ -4,9 +4,10 @@
 // #include "qinmo/net/SocketTCP.h"
 // #include "qinmo/base/StringConcat.h"
 // #include "qinmo/base/Logger.h"
-#include "qinmo/net/TcpConnect.h"
+// #include "qinmo/net/TcpConnect.h"
 // #include "qinmo/net/TcpListen.h"
-#include "qinmo/net/PacketBuffer.h"
+// #include "qinmo/net/PacketBuffer.h"
+#include <qinmo/net/ReactorTcpServer.h>
 #include <iostream>
 
 // using qinmo::Timestamp;
@@ -51,7 +52,7 @@ int main()
     // // SockTCP
     // qinmo::net::SocketTCP sock = qinmo::net::SocketTCP::createNonBlockOrDie(qinmo::net::InetAddr());
     //
-    // // Logger
+    // Logger
     // QINMO_TRACE("This is a trial ", 10, " and ", 90);
     // QINMO_DEBUG("This is a trial ", 10, " and ", 0);
     // QINMO_INFO("This is a trial ", 10, " and ", 9);
@@ -98,41 +99,70 @@ int main()
     // std::cout << local.getIP() << std::endl;
     // std::cout << cli.getPeerAddr().getIP() << std::endl;
 
-    using namespace qinmo::net;
-    #define TEMP_EOE(isTrue, describe) if (!isTrue) { std::cout << describe << std::endl; return -1; }
-
-    InetAddr serAddr;
-    serAddr.setIP("192.168.87.212");
-    serAddr.setPort(7129);
-    TEMP_EOE(serAddr.isValid(), "server address error.");
-    TcpConnect connect = TcpConnect::connectRaw(serAddr);
-    TEMP_EOE(connect.isValid(), "connect invalid.");
-
-    PacketBuffer bufOut(1);
-    std::string s = "Hello, it's a connect to test PacketBuffer class. Reply something, please.\n";
-    bufOut.appendString(s);
-    TEMP_EOE(bufOut.headSet8(0, s.size()), "protocol header error");
-    ssize_t len = 0;
-    int savederror = 0;
-    len = bufOut.writeFd(connect.getfd(), savederror);
-    int8_t headerNumbet = 0;
-    std::cout << "len:" << len
-            << ", header:" << bufOut.headGet8(0, headerNumbet)
-            << ", size:" << (int)headerNumbet
-            << ", error code:" << savederror
-            << std::endl;
-
-    // PacketBuffer bufIn(0);
+    // using namespace qinmo::net;
+    // #define TEMP_EOE(isTrue, describe) if (!isTrue) { std::cout << describe << std::endl; return -1; }
+    //
+    // InetAddr serAddr;
+    // serAddr.setIP("192.168.87.212");
+    // serAddr.setPort(7129);
+    // TEMP_EOE(serAddr.isValid(), "server address error.");
+    // TcpConnect connect = TcpConnect::connectRaw(serAddr);
+    // TEMP_EOE(connect.isValid(), "connect invalid.");
+    //
+    // PacketBuffer bufOut(1);
+    // std::string s = "Hello, it's a connect to test PacketBuffer class. Reply something, please.\n";
+    // bufOut.appendString(s);
+    // TEMP_EOE(bufOut.headSet8(0, s.size()), "protocol header error");
+    // ssize_t len = 0;
+    // int savederror = 0;
+    // len = bufOut.writeFd(connect.getfd(), savederror);
+    // int8_t headerNumbet = 0;
+    // std::cout << "len:" << len
+    //         << ", header:" << bufOut.headGet8(0, headerNumbet)
+    //         << ", size:" << (int)headerNumbet
+    //         << ", error code:" << savederror
+    //         << std::endl;
+    //
+    // // PacketBuffer bufIn(0);
+    // // len = bufIn.readFd(connect.getfd(), savederror, 12);
+    // // bufIn.retrieveAll(s);
+    // // std::cout << s << std::endl;
+    //
+    // PacketBuffer bufIn(1);
     // len = bufIn.readFd(connect.getfd(), savederror, 12);
-    // bufIn.retrieveAll(s);
-    // std::cout << s << std::endl;
+    // TEMP_EOE(bufIn.retrieve8(headerNumbet), "retrieve8");
+    // TEMP_EOE(bufIn.headSet8(0, headerNumbet), "headSet8");
+    // TEMP_EOE(bufIn.retrieveAll(s), "retrieveAll");
+    // std::cout << "len:" << len << ", size:" << headerNumbet << ", text:" << s << std::endl;
 
-    PacketBuffer bufIn(1);
-    len = bufIn.readFd(connect.getfd(), savederror, 12);
-    TEMP_EOE(bufIn.retrieve8(headerNumbet), "retrieve8");
-    TEMP_EOE(bufIn.headSet8(0, headerNumbet), "headSet8");
-    TEMP_EOE(bufIn.retrieveAll(s), "retrieveAll");
-    std::cout << "len:" << len << ", size:" << headerNumbet << ", text:" << s << std::endl;
+    using namespace qinmo::net;
+    using namespace qinmo;
+
+    EventLoop loop;
+
+    InetAddr addr;
+    addr.setIP("192.168.87.90");
+    addr.setPort(7129);
+    ReactorTcpServer server(&loop, addr, 2);
+
+    server.setConnectFunc(
+        [](const RTcpConnPtr& conn) -> void
+        {
+            std::cout << conn->getfd() << std::endl;
+            QINMO_DEBUG("connect func : fd=", conn->getfd());
+        }
+    );
+    server.setMessageFunc(
+        [](const RTcpConnPtr& conn, PacketBuffer& buf, Timestamp time) -> void
+        {
+            std::string s;
+            buf.retrieveString(1, s);
+            std::cout << s << std::endl;
+            QINMO_DEBUG(s);
+        }
+    );
+    server.start();
+    loop.loop();
 
     return 0;
 }
