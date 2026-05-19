@@ -51,6 +51,8 @@ public:
 
     ssize_t recv(char* buf, size_t len);
     ssize_t send(const char* buf, size_t len);
+    /// @brief half-close (close write and send FIN to peer)
+    bool shutdownWrite();
     /// @note isValid function return false After call close
     bool close();
 

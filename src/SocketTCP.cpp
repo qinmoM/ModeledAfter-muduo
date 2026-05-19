@@ -129,6 +129,15 @@ bool SocketTCP::connect(const InetAddr &addr)
     return true;
 }
 
+bool SocketTCP::shutdownWrite()
+{
+    if (-1 == sockfd_ || !detail::shutdownWrite(sockfd_))
+        return false;
+
+    sockfd_ = -1;
+    return true;
+}
+
 bool SocketTCP::close()
 {
     if (-1 == sockfd_ || -1 == qinmo::detail::close(sockfd_))

@@ -59,6 +59,11 @@ ssize_t TcpConnect::send(const char *buf, size_t len)
     return sock_.send(buf, len);
 }
 
+bool TcpConnect::shutdownWrite()
+{
+    return sock_.shutdownWrite();
+}
+
 bool TcpConnect::close()
 {
     return sock_.close();

@@ -71,6 +71,8 @@ public:
     /// @brief connect server
     /// @param addr server address
     bool connect(const InetAddr& addr);
+    /// @brief half-close (close write and send FIN to peer)
+    bool shutdownWrite();
     bool close();
 
     /// @brief set whether Nagle algorithm (TCP packet buffering)
