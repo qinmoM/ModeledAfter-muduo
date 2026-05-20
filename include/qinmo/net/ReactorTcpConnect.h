@@ -60,6 +60,7 @@ public:
     void send(qinmo::net::PacketBuffer buf);
 
     void setTcpNoDelay(bool enable);
+    /// @note do nothing when in write event
     void shutdown();
 
     void setConnectFunc(const ConnectFunc& f);

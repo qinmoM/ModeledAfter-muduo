@@ -134,7 +134,6 @@ bool SocketTCP::shutdownWrite()
     if (-1 == sockfd_ || !detail::shutdownWrite(sockfd_))
         return false;
 
-    sockfd_ = -1;
     return true;
 }
 

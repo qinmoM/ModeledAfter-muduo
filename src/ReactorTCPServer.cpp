@@ -127,11 +127,15 @@ void ReactorTcpServer::newConnect(Timestamp time)
 
 void ReactorTcpServer::removeConnect(const RTcpConnPtr& conn)
 {
-    QINMO_INFO("TcpServer remove connection. cfd=", conn->getfd());
-    if (0 == rConnects_.erase(conn->getfd()))
-        QINMO_ERROR("TcpServer not found fd=", conn->getfd(), " , give up remove.");
-    else
-        conn->getLoop()->queueInLoop( [conn]() -> void { conn->connectDestroyed(); } );
+    QINMO_INFO("ReactorTcpServer remove connection. cfd=", conn->getfd());
+
+    conn->getLoop()->queueInLoop(
+        [this, conn]() -> void
+        {
+            rConnects_.erase(conn->getfd());
+            conn->connectDestroyed();
+        }
+    );
 }
 
 } // namespace net
