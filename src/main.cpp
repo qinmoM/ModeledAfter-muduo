@@ -148,8 +148,13 @@ int main()
     server.setConnectFunc(
         [](const RTcpConnPtr& conn) -> void
         {
-            std::cout << conn->getfd() << std::endl;
-            QINMO_DEBUG("main.connect func : fd=", conn->getfd());
+            qinmo::print("connection come. fd=", conn->getfd(), ", local:", conn->getLocalAddr().getIP(), ", peer:", conn->getPeerAddr().getIP());
+        }
+    );
+    server.setDisconnectFunc(
+        [](const RTcpConnPtr& conn) -> void
+        {
+            qinmo::print("disconnection. fd=", conn->getfd(), ", local:", conn->getLocalAddr().getIP(), ", peer:", conn->getPeerAddr().getIP());
         }
     );
     server.setMessageFunc(
@@ -157,10 +162,11 @@ int main()
         {
             std::string s;
             buf.retrieveAll(s);
-            QINMO_DEBUG(s);
-            conn->shutdown();
+            qinmo::print("receive message:", s, " fd=", conn->getfd());
+            conn->send(s);
         }
     );
+
     server.start();
     loop.loop();
 

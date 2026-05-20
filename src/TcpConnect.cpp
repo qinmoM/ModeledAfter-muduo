@@ -26,10 +26,7 @@ TcpConnect::TcpConnect() : sock_() { }
 
 TcpConnect::TcpConnect(SocketTCP&& sock) : sock_(std::move(sock)) { }
 
-TcpConnect::~TcpConnect()
-{
-    QINMO_TRACE("TcpConnect release. fd=", sock_.getfd());
-}
+TcpConnect::~TcpConnect() { }
 
 
 bool TcpConnect::isValid() const
