@@ -19,22 +19,19 @@ ReactorTcpConnect::ReactorTcpConnect(EventLoop* loop, TcpConnect&& sock, const I
     , inputBuffer_(0)
     , outputBuffer_(0)
 {
-    QINMO_DEBUG("receive TcpConnect fd=", sock_.getfd(), ", now paramfd=", sock.getfd());
     channel_.setReadEvent( [this](Timestamp time) -> void { handleRead(time); } );
     channel_.setWriteEvent( [this]() -> void { handleWrite(); } );
     channel_.setCloseEvent( [this]() -> void { handleClose(); } );
     channel_.setErrorEvent( [this]() -> void { handleError(); } );
-    QINMO_INFO("new ReactorTcpConnect connect : fd=", sock_.getfd());
+    QINMO_TRACE("new ReactorTcpConnect connect : fd=", sock_.getfd());
 
-    if (sock_.setKeepAlive(true))
-        QINMO_INFO("set keepAlive fd=", sock_.getfd());
-    else
-        QINMO_DEBUG("Failed to set keepAlive fd=", sock_.getfd());
+    if (!sock_.setKeepAlive(true))
+        QINMO_WARN("ReactorTcpConnect:Create successful buf Failed to set keepAlive fd=", sock_.getfd());
 }
 
 ReactorTcpConnect::~ReactorTcpConnect()
 {
-    QINMO_INFO("ReactorTcpConnect disconnect : fd=", sock_.getfd(), ", state=", getStateStr().data());
+    QINMO_TRACE("ReactorTcpConnect disconnect : fd=", sock_.getfd(), ", state=", getStateStr().data());
 }
 
 
@@ -51,12 +48,11 @@ EventLoop* ReactorTcpConnect::getLoop() const
 
 void ReactorTcpConnect::connectEstablished()
 {
-    QINMO_TRACE("ReactorTcpConnect:enter fd=", sock_.getfd(), ", established.");
+    QINMO_DEBUG("ReactorTcpConnect:enter fd=", sock_.getfd(), ", established.");
     state_ = RTcpConnState::Connected;
     channel_.tie(shared_from_this());
     channel_.enableRead();
 
-    QINMO_DEBUG("established execute connectFunc() ", (connectFunc_ ? "exists" : "not exists"));
     if (connectFunc_)
         connectFunc_(shared_from_this());
 }
@@ -77,6 +73,57 @@ void ReactorTcpConnect::connectDestroyed()
 }
 
 
+void ReactorTcpConnect::send(const std::string& str)
+{
+    if (RTcpConnState::Connected != state_)
+        return;
+
+    std::size_t oldSize = outputBuffer_.getReadableSize();
+    std::size_t newSize = oldSize + str.size();
+    if (highWaterMarkFunc_ && waterMark_ > oldSize && waterMark_ <= newSize)
+    {
+        RTcpConnPtr p = shared_from_this();
+        loop_->queueInLoop(
+            [p, newSize]() -> void
+            {
+                p->highWaterMarkFunc_(p, newSize);
+            }
+        );
+    }
+
+    outputBuffer_.appendString(str);
+
+    if (!channel_.isWrite())
+        channel_.enableWrite();
+}
+
+void ReactorTcpConnect::send(PacketBuffer& buf)
+{
+    if (RTcpConnState::Connected != state_)
+        return;
+
+    std::string str;
+    if (!buf.headGetString(0, buf.getHeadSize(), str))
+    {
+        // it definitely won't happen
+        QINMO_ERROR("PacketBuffer.send(buf) error. fd=", sock_.getfd());
+        return;
+    }
+    outputBuffer_.appendString(str);
+
+    if (!buf.peekAll(str))
+    {
+        // it definitely won't happen
+        QINMO_ERROR("PacketBuffer.send(buf) error. fd=", sock_.getfd());
+        return;
+    }
+    outputBuffer_.appendString(str);
+
+    if (!channel_.isWrite())
+        channel_.enableWrite();
+}
+
+
 void ReactorTcpConnect::setTcpNoDelay(bool enable)
 {
     RTcpConnPtr self = shared_from_this();
@@ -90,7 +137,7 @@ void ReactorTcpConnect::setTcpNoDelay(bool enable)
 
 void ReactorTcpConnect::shutdown()
 {
-    if (RTcpConnState::Connected != state_)
+    if (RTcpConnState::Connected != state_ || RTcpConnState::Connecting != state_)
         return;
 
     state_ = RTcpConnState::Disconnecting;
@@ -155,10 +202,9 @@ qinmo::StringView ReactorTcpConnect::getStateStr() const
 
 void ReactorTcpConnect::handleRead(Timestamp time)
 {
-    QINMO_TRACE("ReactorTcpConnect:enter handleRead. fd=", sock_.getfd(), ", waterMark:", waterMark_);
     int save = 0;
     ssize_t len = inputBuffer_.readFd(sock_.getfd(), save);
-    QINMO_DEBUG("read size :", len, ", fd=", sock_.getfd());
+
     if (0 > len)
         handleError();
     else if (0 == len)

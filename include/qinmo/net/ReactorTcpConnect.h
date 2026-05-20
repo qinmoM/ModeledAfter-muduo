@@ -57,7 +57,7 @@ public:
     void connectDestroyed();
 
     void send(const std::string& str);
-    void send(qinmo::net::PacketBuffer buf);
+    void send(PacketBuffer& buf);
 
     void setTcpNoDelay(bool enable);
     /// @note do nothing when in write event
