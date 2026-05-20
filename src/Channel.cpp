@@ -12,6 +12,8 @@ Channel::Channel(EventLoop* eventLoop, int fd)
     , tie_()
     , tied_(false)
     , fd_(fd)
+    , events_(0)
+    , revents_(0)
     , isInLoop_(false)
 { }
 
