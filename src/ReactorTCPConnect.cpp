@@ -151,6 +151,15 @@ void ReactorTcpConnect::shutdown()
     );
 }
 
+void ReactorTcpConnect::close()
+{
+    if (RTcpConnState::Connecting == state_ || RTcpConnState::Disconnected == state_)
+        return;
+
+    RTcpConnPtr p = shared_from_this();
+    loop_->queueInLoop([p]() -> void { p->handleClose(); });
+}
+
 
 void ReactorTcpConnect::setConnectFunc(const ConnectFunc &f)
 {

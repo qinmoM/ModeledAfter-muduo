@@ -62,6 +62,7 @@ public:
     void setTcpNoDelay(bool enable);
     /// @note do nothing when in write event
     void shutdown();
+    void close();
 
     void setConnectFunc(const ConnectFunc& f);
     void setDisconnectFunc(const DisconnectFunc& f);
