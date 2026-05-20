@@ -52,6 +52,8 @@ public:
 public:
     int getfd() const;
     EventLoop* getLoop() const;
+    InetAddr getLocalAddr() const;
+    InetAddr getPeerAddr() const;
 
     void connectEstablished();
     void connectDestroyed();

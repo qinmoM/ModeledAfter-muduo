@@ -45,6 +45,16 @@ EventLoop* ReactorTcpConnect::getLoop() const
     return loop_;
 }
 
+InetAddr ReactorTcpConnect::getLocalAddr() const
+{
+    return localAddr_;
+}
+
+InetAddr ReactorTcpConnect::getPeerAddr() const
+{
+    return peerAddr_;
+}
+
 
 void ReactorTcpConnect::connectEstablished()
 {
