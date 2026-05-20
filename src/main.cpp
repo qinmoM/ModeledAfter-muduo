@@ -141,7 +141,7 @@ int main()
     EventLoop loop;
 
     InetAddr addr;
-    addr.setIP("192.168.87.90");
+    addr.setIP("192.168.233.90");
     addr.setPort(7129);
     ReactorTcpServer server(&loop, addr, 2);
 
@@ -149,7 +149,7 @@ int main()
         [](const RTcpConnPtr& conn) -> void
         {
             std::cout << conn->getfd() << std::endl;
-            QINMO_DEBUG("connect func : fd=", conn->getfd());
+            QINMO_DEBUG("main.connect func : fd=", conn->getfd());
         }
     );
     server.setMessageFunc(
@@ -157,8 +157,8 @@ int main()
         {
             std::string s;
             buf.retrieveString(1, s);
-            std::cout << s << std::endl;
             QINMO_DEBUG(s);
+            conn->shutdown();
         }
     );
     server.start();
