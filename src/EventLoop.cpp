@@ -17,6 +17,7 @@ EventLoop::EventLoop()
     , looping_(false)
     , pending_(false)
 {
+    QINMO_DEBUG("EventLoop.wakeup create and set channel. fd=", wakeupfd_);
     wakeupChannel_->setReadEvent( [this](Timestamp) -> void { wakeupRead(); } );
     wakeupChannel_->enableRead();
 }
@@ -44,6 +45,7 @@ void EventLoop::loop()
         activeChannels_.clear();
         pollerReturnTime_ = poller_->poll(timeoutMs_.load(), activeChannels_);
 
+        QINMO_DEBUG("poll return. active channel number:", activeChannels_.size());
         for (Channel* channel : activeChannels_)
             channel->handle(pollerReturnTime_);
 

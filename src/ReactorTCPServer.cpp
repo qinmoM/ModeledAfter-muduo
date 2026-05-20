@@ -21,6 +21,7 @@ ReactorTcpServer::ReactorTcpServer(EventLoop* loop, const InetAddr& listenAddr, 
         QINMO_FATAL("Failed to create socket with nonblockOrDie.");
         std::terminate();
     }
+    QINMO_DEBUG("TcpServer:listen socket create fd=", sock_.getfd());
 
     if (!sock_.setReuseAddr(true))
         QINMO_ERROR("Failed to set reuse address.");
@@ -33,7 +34,7 @@ ReactorTcpServer::ReactorTcpServer(EventLoop* loop, const InetAddr& listenAddr, 
         std::terminate();
     }
 
-    QINMO_DEBUG("set listen read event");
+    QINMO_DEBUG("TcpServer:set listen read event fd=", sock_.getfd());
     acceptChannel_.setReadEvent( [this](Timestamp stamp) -> void { newConnect(stamp); } );
 }
 
