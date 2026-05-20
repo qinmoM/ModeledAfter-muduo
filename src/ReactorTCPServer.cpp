@@ -16,12 +16,12 @@ ReactorTcpServer::ReactorTcpServer(EventLoop* loop, const InetAddr& listenAddr, 
     , started_(false)
     , numConn_(0)
 {
+    QINMO_INFO("ReactorTcpServer create.");
     if (!sock_.isValid())
     {
         QINMO_FATAL("Failed to create socket with nonblockOrDie.");
         std::terminate();
     }
-    QINMO_DEBUG("TcpServer:listen socket create fd=", sock_.getfd());
 
     if (!sock_.setReuseAddr(true))
         QINMO_ERROR("Failed to set reuse address.");
@@ -34,8 +34,8 @@ ReactorTcpServer::ReactorTcpServer(EventLoop* loop, const InetAddr& listenAddr, 
         std::terminate();
     }
 
-    QINMO_DEBUG("TcpServer:set listen read event fd=", sock_.getfd());
     acceptChannel_.setReadEvent( [this](Timestamp stamp) -> void { newConnect(stamp); } );
+    QINMO_DEBUG("TcpServer:listen socket create successful. fd=", sock_.getfd());
 }
 
 ReactorTcpServer::~ReactorTcpServer()
@@ -101,7 +101,7 @@ void ReactorTcpServer::newConnect(Timestamp time)
         QINMO_ERROR("Failed to accept - client invalid. cfd=", cli.getfd());
         return;
     }
-    QINMO_INFO("New client: ", numConn_.load(), ", fd: ", cli.getfd(), ", ip: ", peerAddr.getIP(), ", port: ", peerAddr.getPort(), ".");
+    QINMO_TRACE("New client: ", numConn_.load(), ", fd: ", cli.getfd(), ", ip: ", peerAddr.getIP(), ", port: ", peerAddr.getPort(), ".");
 
     EventLoop* subLoop = threadPool_->getNextLoop();
     InetAddr localAddr = sock_.getLocalAddr();
@@ -127,7 +127,7 @@ void ReactorTcpServer::newConnect(Timestamp time)
 
 void ReactorTcpServer::removeConnect(const RTcpConnPtr& conn)
 {
-    QINMO_INFO("ReactorTcpServer remove connection. cfd=", conn->getfd());
+    QINMO_TRACE("ReactorTcpServer remove connection. cfd=", conn->getfd());
 
     conn->getLoop()->queueInLoop(
         [this, conn]() -> void

@@ -14,9 +14,7 @@ EpollPoller::EpollPoller(EventLoop* eventLoop)
     : Poller(eventLoop)
     , epollfd_(::epoll_create1(EPOLL_CLOEXEC))
     , eventsbuf_(16)
-{
-    QINMO_DEBUG("EpollPoller.epoll create fd=", epollfd_);
-}
+{ }
 
 EpollPoller::~EpollPoller()
 {
@@ -52,12 +50,10 @@ void EpollPoller::setChannel(Channel& channel)
     if (channels_.find(fd) == channels_.end())
     {
         channels_[fd] = &channel;
-        QINMO_DEBUG("setChannel add:", channel.events(), ", fd=", channel.fd());
         epollCTL(EPOLL_CTL_ADD, channel);
     }
     else
     {
-        QINMO_DEBUG("setChannel ctl:", channel.events(), ", fd=", channel.fd());
         epollCTL(EPOLL_CTL_MOD, channel);
     }
 }

@@ -29,7 +29,7 @@ void EventLoopThreadPool::start(EventLoopThread::EventLoopThreadInitFunc func)
 {
     if (started_.load())
     {
-        QINMO_ERROR("Cannot start again.");
+        QINMO_ERROR("EventLoopThreadPool:Cannot start again.");
         return;
     }
 

@@ -126,35 +126,22 @@ bool Channel::isAll() const
 void Channel::handle(Timestamp timestamp)
 {
     auto guard = tie_.lock();
-    QINMO_TRACE("Channel handle. fd=", fd_);
     if (tied_ && nullptr == guard)
         return;
 
     isInLoop_.store(true);
 
     if (closeEvent_ && (  (revents_ & (EPOLLHUP))  &&  !(revents_ & (EPOLLIN))  ) )
-    {
-        QINMO_TRACE("Channel handle close. fd=", fd_);
         closeEvent_();
-    }
 
     if (errorEvent_ && (  revents_ & (EPOLLERR)  ) )
-    {
-        QINMO_TRACE("Channel handle error. fd=", fd_);
         errorEvent_();
-    }
 
     if (readEvent_ && (  revents_ & (EPOLLIN | EPOLLPRI | EPOLLRDHUP)  ) )
-    {
-        QINMO_TRACE("Channel handle read. fd=", fd_);
         readEvent_(timestamp);
-    }
 
     if (writeEvent_ && (  revents_ & (EPOLLOUT)  ) )
-    {
-        QINMO_TRACE("Channel handle write. fd=", fd_);
         writeEvent_();
-    }
 
     isInLoop_.store(false);
 }
