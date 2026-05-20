@@ -156,7 +156,7 @@ int main()
         [](const RTcpConnPtr& conn, PacketBuffer& buf, Timestamp time) -> void
         {
             std::string s;
-            buf.retrieveString(1, s);
+            buf.retrieveAll(s);
             QINMO_DEBUG(s);
             conn->shutdown();
         }

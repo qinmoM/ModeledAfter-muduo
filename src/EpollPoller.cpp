@@ -28,6 +28,7 @@ Timestamp EpollPoller::poll(int timeoutMs, ChannelList& list)
     int size = eventsbuf_.size();
     int len = ::epoll_wait(epollfd_, &*(eventsbuf_.begin()), size, timeoutMs);
     Timestamp time = Timestamp::now();
+    sleep(4);
 
     if (len > 0)
     {

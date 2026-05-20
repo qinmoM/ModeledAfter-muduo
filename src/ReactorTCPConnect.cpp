@@ -8,24 +8,28 @@ namespace qinmo
 namespace net
 {
 
-ReactorTcpConnect::ReactorTcpConnect(EventLoop* loop, TcpConnect sock, const InetAddr& localAddr, const InetAddr& peerAddr)
+ReactorTcpConnect::ReactorTcpConnect(EventLoop* loop, TcpConnect&& sock, const InetAddr& localAddr, const InetAddr& peerAddr)
     : loop_(loop)
-    , channel_(loop, sock.getfd())
     , sock_(std::move(sock))
+    , channel_(loop, sock_.getfd())
     , localAddr_(localAddr)
     , peerAddr_(peerAddr)
     , state_(RTcpConnState::Connecting)
-    , waterMark_(64 * 1024 * 1024)
+    , waterMark_(64 * 1024)
     , inputBuffer_(0)
     , outputBuffer_(0)
 {
+    QINMO_DEBUG("receive TcpConnect fd=", sock_.getfd(), ", now paramfd=", sock.getfd());
     channel_.setReadEvent( [this](Timestamp time) -> void { handleRead(time); } );
     channel_.setWriteEvent( [this]() -> void { handleWrite(); } );
     channel_.setCloseEvent( [this]() -> void { handleClose(); } );
     channel_.setErrorEvent( [this]() -> void { handleError(); } );
     QINMO_INFO("new ReactorTcpConnect connect : fd=", sock_.getfd());
 
-    sock_.setKeepAlive(true);
+    if (sock_.setKeepAlive(true))
+        QINMO_INFO("set keepAlive fd=", sock_.getfd());
+    else
+        QINMO_DEBUG("Failed to set keepAlive fd=", sock_.getfd());
 }
 
 ReactorTcpConnect::~ReactorTcpConnect()
@@ -34,18 +38,32 @@ ReactorTcpConnect::~ReactorTcpConnect()
 }
 
 
+int ReactorTcpConnect::getfd() const
+{
+    return sock_.getfd();
+}
+
+EventLoop* ReactorTcpConnect::getLoop() const
+{
+    return loop_;
+}
+
+
 void ReactorTcpConnect::connectEstablished()
 {
+    QINMO_TRACE("ReactorTcpConnect:enter fd=", sock_.getfd(), ", established.");
     state_ = RTcpConnState::Connected;
     channel_.tie(shared_from_this());
     channel_.enableRead();
 
+    QINMO_DEBUG("established execute connectFunc() ", (connectFunc_ ? "exists" : "not exists"));
     if (connectFunc_)
         connectFunc_(shared_from_this());
 }
 
 void ReactorTcpConnect::connectDestroyed()
 {
+    QINMO_DEBUG("ReactorTcpConnect:enter destroyed fd=", sock_.getfd(), ", state=", getStateStr().data());
     if (RTcpConnState::Connected == state_)
     {
         state_ = RTcpConnState::Disconnected;
@@ -61,8 +79,9 @@ void ReactorTcpConnect::connectDestroyed()
 
 void ReactorTcpConnect::setTcpNoDelay(bool enable)
 {
+    RTcpConnPtr self = shared_from_this();
     loop_->runInLoop(
-        [self = shared_from_this(), enable]() -> void
+        [self, enable]() -> void
         {
             self->sock_.setTcpNoDelay(enable);
         }
@@ -75,8 +94,9 @@ void ReactorTcpConnect::shutdown()
         return;
 
     state_ = RTcpConnState::Disconnecting;
+    RTcpConnPtr self = shared_from_this();
     loop_->runInLoop(
-        [self = shared_from_this()]() -> void
+        [self]() -> void
         {
             if (!self->channel_.isWrite())
                 self->sock_.shutdownWrite();
@@ -105,8 +125,9 @@ void ReactorTcpConnect::setMessageFunc(const MessageFunc &f)
     messageFunc_ = f;
 }
 
-void ReactorTcpConnect::setHighWaterMarkFunc(const HighWaterMarkFunc &f)
+void ReactorTcpConnect::setHighWaterMarkFunc(std::size_t waterMark, const HighWaterMarkFunc &f)
 {
+    waterMark_ = waterMark;
     highWaterMarkFunc_ = f;
 }
 
@@ -134,8 +155,10 @@ qinmo::StringView ReactorTcpConnect::getStateStr() const
 
 void ReactorTcpConnect::handleRead(Timestamp time)
 {
+    QINMO_TRACE("ReactorTcpConnect:enter handleRead. fd=", sock_.getfd(), ", waterMark:", waterMark_);
     int save = 0;
     ssize_t len = inputBuffer_.readFd(sock_.getfd(), save);
+    QINMO_DEBUG("read size :", len, ", fd=", sock_.getfd());
     if (0 > len)
         handleError();
     else if (0 == len)
@@ -174,7 +197,10 @@ void ReactorTcpConnect::handleWrite()
 
     channel_.disableWrite();
     if (writeCompleteFunc_)
-        loop_->queueInLoop([self = shared_from_this()]() -> void { self->writeCompleteFunc_(self); });
+    {
+        RTcpConnPtr self = shared_from_this();
+        loop_->queueInLoop([self]() -> void { self->writeCompleteFunc_(self); });
+    }
 
     if (RTcpConnState::Disconnecting == state_)
         shutdown();
@@ -185,13 +211,13 @@ void ReactorTcpConnect::handleClose()
     if (RTcpConnState::Disconnected == state_)
         return;
 
-    QINMO_INFO("ReactorTcpConnect close. fd=", sock_.getfd(), ", state=", getStateStr());
+    QINMO_INFO("ReactorTcpConnect close. fd=", sock_.getfd(), ", state=", getStateStr().data());
     state_ = RTcpConnState::Disconnected;
     channel_.disableAll();
 
     RTcpConnPtr connPtr(shared_from_this());
     if (disconnectFunc_) disconnectFunc_(connPtr);
-    closeFunc_(connPtr);
+    closeFunc_();
 }
 
 void ReactorTcpConnect::handleError()

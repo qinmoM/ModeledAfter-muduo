@@ -1,4 +1,5 @@
 #include "qinmo/net/TcpConnect.h"
+#include "qinmo/base/Logger.h"
 
 /// @namespace qinmo
 namespace qinmo
@@ -25,7 +26,10 @@ TcpConnect::TcpConnect() : sock_() { }
 
 TcpConnect::TcpConnect(SocketTCP&& sock) : sock_(std::move(sock)) { }
 
-TcpConnect::~TcpConnect() { }
+TcpConnect::~TcpConnect()
+{
+    QINMO_TRACE("TcpConnect release. fd=", sock_.getfd());
+}
 
 
 bool TcpConnect::isValid() const
