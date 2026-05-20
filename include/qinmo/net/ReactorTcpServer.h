@@ -50,8 +50,8 @@ private:
     MessageFunc message_;
     WriteCompleteFunc writeComplete_;
 
-    Channel acceptChannel_;
     TcpListen sock_;
+    Channel acceptChannel_;
     std::atomic<bool> started_;
     std::atomic<int> numConn_;
 
