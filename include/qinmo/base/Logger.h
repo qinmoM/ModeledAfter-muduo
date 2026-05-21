@@ -10,21 +10,33 @@ namespace qinmo
 {
 
 /// @note the written file
-#ifdef PATH_LOGS
-constexpr const char* loggerPath = PATH_LOGS;
-#elif
+#ifdef QINMO_LOG_PATH
+constexpr const char* loggerPath = QINMO_LOG_PATH;
+#else
 constexpr const char* loggerPath = "logs/logger.log";
 #endif
 
 /// @note
 /// if macro is defined, logs of the level will be written into the log file
 /// if not needed, simply comment out the macro
+#if !defined(QINMO_LOG_LEVEL) || QINMO_LOG_LEVEL <= 0
 #define ENABLE_TRACE
+#endif
+#if !defined(QINMO_LOG_LEVEL) || QINMO_LOG_LEVEL <= 1
 #define ENABLE_DEBUG
+#endif
+#if !defined(QINMO_LOG_LEVEL) || QINMO_LOG_LEVEL <= 2
 #define ENABLE_INFO
+#endif
+#if !defined(QINMO_LOG_LEVEL) || QINMO_LOG_LEVEL <= 3
 #define ENABLE_WARN
+#endif
+#if !defined(QINMO_LOG_LEVEL) || QINMO_LOG_LEVEL <= 4
 #define ENABLE_ERROR
+#endif
+#if !defined(QINMO_LOG_LEVEL) || QINMO_LOG_LEVEL <= 5
 #define ENABLE_FATAL
+#endif
 
 
 
