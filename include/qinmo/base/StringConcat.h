@@ -24,4 +24,10 @@ void print(Args&&... args)
     std::cout << concat(args...);
 }
 
+template <typename... Args>
+void println(Args&&... args)
+{
+    std::cout << concat(args...) << '\n';
+}
+
 } // namespace qinmo

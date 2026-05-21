@@ -1,7 +1,7 @@
 #pragma once
 
-#include "qinmo/net/Poller.h"
-#include "qinmo/net/detail/Wrapper.h"
+#include "Poller.h"
+#include "detail/Wrapper.h"
 #include "qinmo/base/ThreadConfig.h"
 #include <mutex>
 
