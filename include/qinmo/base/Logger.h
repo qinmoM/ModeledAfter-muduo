@@ -13,7 +13,7 @@ namespace qinmo
 #ifdef QINMO_LOG_PATH
 constexpr const char* loggerPath = QINMO_LOG_PATH;
 #else
-constexpr const char* loggerPath = "logs/logger.log";
+constexpr const char* loggerPath = "logs.log";
 #endif
 
 /// @note
@@ -62,34 +62,49 @@ public:
     template<typename... Args>
     void log(Args&&... args)
     {
-        std::string str = qinmo::concat('[', qinmo::Timestamp::now().toStringMicroseconds(), "] [TID:", qinmo::detail::getTid32(), "] ", args..., '\n');
+        Timestamp time = qinmo::Timestamp::now();
+        std::string str = qinmo::concat('[', time.toStringMicroseconds(), "] [TID:", qinmo::detail::getTid32(), "] ", args..., '\n');
 
         std::lock_guard<std::mutex> lock(mutex_);
-        ofs_ << str;
 
-        ofs_.flush();
+        ofs_ << str;
+        ++count_;
+        if (0 == count_ % 128 || time.getSeconds() - lastTime_.getSeconds() >= 2)
+        {
+            lastTime_ = time;
+            count_ = 0;
+            ofs_.flush();
+        }
     }
 
     /// @brief flush buffer
     void flush()
     {
+        std::lock_guard<std::mutex> lock(mutex_);
         ofs_.flush();
     }
 
 private:
     Logger()
         : ofs_(loggerPath, std::ios::app)
-    {}
+        , lastTime_(Timestamp::now())
+        , count_(0)
+    {
+        ofs_ << '\n';
+    }
 
     ~Logger()
     {
         std::lock_guard<std::mutex> lock(mutex_);
+        ofs_.flush();
         ofs_.close();
     }
 
 private:
     std::ofstream ofs_;
     std::mutex mutex_;
+    Timestamp lastTime_;
+    unsigned int count_;
 
 };
 
