@@ -1,12 +1,14 @@
 cmake_minimum_required(VERSION 3.10)
 project(qinmo_net)
 
-set(QINMO_LOG_PATH "${CMAKE_BINARY_DIR}/logs.log"
+set(QINMO_LOG_PATH "${CMAKE_BINARY_DIR}/logs/logger.log"
     CACHE STRING "qinmo-net log path"
 )
 set(QINMO_LOG_LEVEL 3
     CACHE INTERNAL "qinmo-net log level"
 )
+
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/logs)
 
 add_library(qinmo_net
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Channel.cpp
