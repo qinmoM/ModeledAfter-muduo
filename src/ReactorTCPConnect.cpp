@@ -23,7 +23,7 @@ ReactorTcpConnect::ReactorTcpConnect(EventLoop* loop, TcpConnect&& sock, const I
     channel_.setWriteEvent( [this]() -> void { handleWrite(); } );
     channel_.setCloseEvent( [this]() -> void { handleClose(); } );
     channel_.setErrorEvent( [this]() -> void { handleError(); } );
-    QINMO_TRACE("new ReactorTcpConnect connect : fd=", sock_.getfd());
+    QINMO_INFO("new ReactorTcpConnect connect : fd=", sock_.getfd());
 
     if (!sock_.setKeepAlive(true))
         QINMO_WARN("ReactorTcpConnect:Create successful buf Failed to set keepAlive fd=", sock_.getfd());
