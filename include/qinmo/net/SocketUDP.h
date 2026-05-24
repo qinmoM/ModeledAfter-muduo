@@ -59,7 +59,7 @@ public:
     /// @note need to Check if the returned InetAddr is valid : Call functions isIPv4() and isIPv6()
     InetAddr getPeerAddr() const;
 
-    ssize_t recvfrom(char* buf, size_t len, const InetAddr& peer);
+    ssize_t recvfrom(char* buf, size_t len, InetAddr& peer);
     ssize_t sendto(const char* buf, size_t len, const InetAddr& peer);
     /// @brief bind local address
     /// @param addr local address

@@ -77,6 +77,9 @@ bool SocketUDP::isConnect() const
 
 InetAddr SocketUDP::getLocalAddr() const
 {
+    if (!isBind())
+        return InetAddr();
+
     detail::sockaddr addr;
     detail::zeroMemory(&addr, sizeof(addr));
     if (!detail::getsockname(sockfd_, addr))
@@ -87,6 +90,9 @@ InetAddr SocketUDP::getLocalAddr() const
 
 InetAddr SocketUDP::getPeerAddr() const
 {
+    if (!isConnect())
+        return InetAddr();
+
     detail::sockaddr addr;
     detail::zeroMemory(&addr, sizeof(addr));
     if (!detail::getpeername(sockfd_, addr))
@@ -96,39 +102,60 @@ InetAddr SocketUDP::getPeerAddr() const
 }
 
 
-ssize_t SocketUDP::recvfrom(char* buf, size_t len, const InetAddr& peer)
+ssize_t SocketUDP::recvfrom(char* buf, size_t len, InetAddr& peer)
 {
-    ;
+    detail::sockaddr addr = peer.getSockaddr();
+    ssize_t len = detail::recvfrom(sockfd_, buf, len, addr);
+    peer = InetAddr(addr);
+    return len;
 }
 
 ssize_t SocketUDP::sendto(const char* buf, size_t len, const InetAddr& peer)
 {
-    ;
+    return detail::sendto(sockfd_, buf, len, peer.getSockaddr());
 }
 
 bool SocketUDP::bind(const InetAddr& local)
 {
-    ;
+    if (-1 == sockfd_ || isBind())
+        return false;
+
+    return detail::bind(sockfd_, local.getSockaddr());
 }
 
 bool SocketUDP::connect(const InetAddr& peer)
 {
-    ;
+    if (-1 == sockfd_ || isConnect())
+        return false;
+
+    return detail::connect(sockfd_, peer.getSockaddr());
 }
 
 ssize_t SocketUDP::recv(char* buf, size_t len)
 {
-    ;
+    if (!isConnect())
+    {
+        errno = ENOTCONN;
+        return -1;
+    }
+
+    return detail::recv(sockfd_, buf, len);
 }
 
 ssize_t SocketUDP::send(const char* buf, size_t len)
 {
-    ;
+    if (!isConnect())
+    {
+        errno = ENOTCONN;
+        return -1;
+    }
+
+    return detail::send(sockfd_, buf, len);
 }
 
 bool SocketUDP::close()
 {
-    if (-1 == sockfd_ || qinmo::detail::close(sockfd_))
+    if (-1 == sockfd_ || !qinmo::detail::close(sockfd_))
         return false;
 
     sockfd_ = -1;
