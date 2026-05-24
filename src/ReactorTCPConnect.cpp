@@ -89,7 +89,40 @@ void ReactorTcpConnect::send(const std::string& str)
         return;
 
     std::size_t oldSize = outputBuffer_.getReadableSize();
-    std::size_t newSize = oldSize + str.size();
+    std::size_t currIndex = 0;
+
+    // try writing directly when nothing in buffer
+    if (!channel_.isWrite() && 0 == oldSize)
+    {
+        size_t len = detail::send(sock_.getfd(), str.data(), str.size());
+        if (len > 0)
+        {
+            if (len == str.size() && writeCompleteFunc_)
+            {
+                RTcpConnPtr self = shared_from_this();
+                loop_->queueInLoop(
+                    [self]() -> void
+                    {
+                        self->writeCompleteFunc_(self);
+                    }
+                );
+                return;
+            }
+            currIndex = len;
+        }
+        else
+        {
+            if (errno != EWOULDBLOCK)
+            {
+                QINMO_ERROR("ReactorTcpConnect:Failed to send string directly. fd=", sock_.getfd());
+                if (errno == EPIPE || errno == ECONNRESET)
+                    return;
+            }
+        }
+    }
+
+    // determine whether call highWaterMark
+    int newSize = oldSize + str.size() - currIndex;
     if (highWaterMarkFunc_ && waterMark_ > oldSize && waterMark_ <= newSize)
     {
         RTcpConnPtr p = shared_from_this();
@@ -101,7 +134,7 @@ void ReactorTcpConnect::send(const std::string& str)
         );
     }
 
-    outputBuffer_.appendString(str);
+    outputBuffer_.appendString(str.substr(currIndex, str.size() - currIndex));
 
     if (!channel_.isWrite())
         channel_.enableWrite();
@@ -166,8 +199,8 @@ void ReactorTcpConnect::close()
     if (RTcpConnState::Connecting == state_ || RTcpConnState::Disconnected == state_)
         return;
 
-    RTcpConnPtr p = shared_from_this();
-    loop_->queueInLoop([p]() -> void { p->handleClose(); });
+    RTcpConnPtr self = shared_from_this();
+    loop_->queueInLoop([self]() -> void { self->handleClose(); });
 }
 
 
@@ -280,8 +313,8 @@ void ReactorTcpConnect::handleClose()
     state_ = RTcpConnState::Disconnected;
     channel_.disableAll();
 
-    RTcpConnPtr connPtr(shared_from_this());
-    if (disconnectFunc_) disconnectFunc_(connPtr);
+    RTcpConnPtr self(shared_from_this());
+    if (disconnectFunc_) disconnectFunc_(self);
     closeFunc_();
 }
 
