@@ -51,10 +51,10 @@ public:
     /// @brief get current file descriptor
     int getfd() const;
     /// @brief get local address
-    /// @note need to Check if the returned InetAddr is valid : Call functions isIPv4() and isIPv6()
+    /// @note need to Check if the returned InetAddr is valid : Call function isValid()
     InetAddr getLocalAddr() const;
     /// @brief get peer address
-    /// @note need to Check if the returned InetAddr is valid : Call functions isIPv4() and isIPv6()
+    /// @note need to Check if the returned InetAddr is valid : Call function isValid()
     InetAddr getPeerAddr() const;
 
     ssize_t recv(char* buf, size_t len);
