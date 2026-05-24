@@ -82,8 +82,8 @@ private:
     SocketUDP(int fd);
 
 private:
-    static constexpr uint8_t isBind = 1;
-    static constexpr uint8_t isConnect = 2;
+    static constexpr uint8_t IsBind = 1;
+    static constexpr uint8_t IsConnect = 2;
 
     int sockfd_ = -1;
     uint8_t state_ = 0;

@@ -18,12 +18,10 @@ SocketTCP SocketTCP::createNonBlockOrDie(const InetAddr& addr)
 
 SocketTCP SocketTCP::attach(const int fd)
 {
-    SocketTCP sockfd(fd);
-
-    if (SOCK_STREAM != detail::getSocketType(sockfd.getfd()))
+    if (SOCK_STREAM != detail::getSocketType(fd))
         return SocketTCP(-1);
 
-    return sockfd;
+    return SocketTCP(fd);
 }
 
 SocketTCP::SocketTCP() : sockfd_(-1) { }
