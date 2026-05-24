@@ -46,7 +46,7 @@ public:
     SocketTCP& operator=(SocketTCP&& other) noexcept;
 
 public:
-    /// @return return true it has been initialized
+    /// @return return true if has been initialized
     bool isValid() const;
     /// @brief get current file descriptor
     int getfd() const;
