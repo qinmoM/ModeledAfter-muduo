@@ -105,9 +105,9 @@ InetAddr SocketUDP::getPeerAddr() const
 ssize_t SocketUDP::recvfrom(char* buf, size_t len, InetAddr& peer)
 {
     detail::sockaddr addr = peer.getSockaddr();
-    ssize_t len = detail::recvfrom(sockfd_, buf, len, addr);
+    ssize_t l = detail::recvfrom(sockfd_, buf, len, addr);
     peer = InetAddr(addr);
-    return len;
+    return l;
 }
 
 ssize_t SocketUDP::sendto(const char* buf, size_t len, const InetAddr& peer)
