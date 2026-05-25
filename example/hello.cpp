@@ -1,5 +1,4 @@
 #include <qinmo/net.h>
-#include <iostream>
 
 int main()
 {
@@ -19,7 +18,7 @@ int main()
     server.setDisconnectFunc(
         [](const qinmo::net::RTcpConnPtr& conn) -> void
         {
-            qinmo::print(conn->getPeerAddr().getIP(), ":", conn->getPeerAddr().getPort(), " disconnect.", '\n');
+            qinmo::println(conn->getPeerAddr().getIP(), ":", conn->getPeerAddr().getPort(), " disconnect.");
         }
     );
 

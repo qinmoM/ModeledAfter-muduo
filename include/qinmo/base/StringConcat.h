@@ -19,12 +19,6 @@ std::string concat(Args&&... args)
 }
 
 template <typename... Args>
-void print(Args&&... args)
-{
-    std::cout << concat(args...);
-}
-
-template <typename... Args>
 void println(Args&&... args)
 {
     std::cout << concat(args...) << '\n';
