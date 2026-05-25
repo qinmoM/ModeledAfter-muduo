@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Poller.h"
+#include "Channel.h"
+#include <vector>
 
 namespace qinmo
 {

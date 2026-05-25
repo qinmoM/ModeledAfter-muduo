@@ -2,11 +2,9 @@
 
 #include "../base/Timestamp.h"
 #include "PollerConfig.h"
-#include "../base/Logger.h"
 #include <functional>
 #include <atomic>
 #include <memory>
-#include <vector>
 
 namespace qinmo
 {

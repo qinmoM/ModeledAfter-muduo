@@ -1,13 +1,14 @@
 #pragma once
 
 #include "qinmo/base/Thread.h"
-#include "EventLoop.h"
 
 namespace qinmo
 {
 /// @namespace qinmo::net
 namespace net
 {
+
+class EventLoop;
 
 class EventLoopThread
 {

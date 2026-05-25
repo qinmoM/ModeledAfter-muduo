@@ -1,4 +1,5 @@
 #include "qinmo/net/ReactorTcpConnect.h"
+#include "qinmo/net/EventLoop.h"
 #include "qinmo/base/Logger.h"
 
 /// @namespace qinmo

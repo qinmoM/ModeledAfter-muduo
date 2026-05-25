@@ -1,7 +1,6 @@
 #pragma once
 
-#include "Poller.h"
-#include "detail/Wrapper.h"
+#include "Channel.h"
 #include "qinmo/base/ThreadConfig.h"
 #include <mutex>
 
@@ -10,6 +9,8 @@ namespace qinmo
 /// @namespace qinmo::net
 namespace net
 {
+
+class Poller;
 
 class EventLoop
 {

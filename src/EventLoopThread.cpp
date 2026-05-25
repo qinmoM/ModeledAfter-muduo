@@ -1,4 +1,5 @@
 #include "qinmo/net/EventLoopThread.h"
+#include "qinmo/net/EventLoop.h"
 
 namespace qinmo
 {

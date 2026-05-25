@@ -1,7 +1,6 @@
 #pragma once
 
 #include "InetAddr.h"
-#include <functional>
 
 /// @namespace qinmo
 namespace qinmo

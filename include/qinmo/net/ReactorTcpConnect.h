@@ -3,7 +3,7 @@
 #include "TcpConnect.h"
 #include "EventLoopThreadPool.h"
 #include "PacketBuffer.h"
-#include <memory>
+#include "Channel.h"
 
 /// @namespace qinmo
 namespace qinmo

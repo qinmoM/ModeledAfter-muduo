@@ -3,7 +3,6 @@
 #include "detail/Operator.h"
 
 #include <string>
-#include <chrono>
 
 /// @namespace qinmo
 namespace qinmo

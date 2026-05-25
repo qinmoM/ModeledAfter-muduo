@@ -1,4 +1,5 @@
 #include "qinmo/net/EventLoopThreadPool.h"
+#include "qinmo/base/Logger.h"
 
 namespace qinmo
 {

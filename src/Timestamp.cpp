@@ -1,6 +1,7 @@
 #include "../include/qinmo/base/Timestamp.h"
 
 #include <ctime>
+#include <chrono>
 
 namespace qinmo
 {

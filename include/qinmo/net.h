@@ -6,10 +6,12 @@
  *      Low-level                : SocketTCP & SocketUDP
  *      Common non-net utilities : println, StringView, Logger ...
  * 
- * @version 0.1.2
+ * @version 0.1.3
  * @author qinmoM
  * @github https://github.com/qinmoM/qinmo_net
  */
 #pragma once
 
 #include <qinmo/net/ReactorTcpServer.h>
+#include <qinmo/net/EventLoop.h>
+#include <qinmo/base/Logger.h>
