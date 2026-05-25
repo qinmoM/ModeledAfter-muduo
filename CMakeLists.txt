@@ -22,6 +22,7 @@ add_library(qinmo_net
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ReactorTCPConnect.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ReactorTCPServer.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/SocketTCP.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/SocketUDP.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/TcpConnect.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/TcpListen.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Thread.cpp

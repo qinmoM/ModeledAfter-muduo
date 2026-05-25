@@ -1,10 +1,10 @@
 /**
  * @file <qinmo/net.h>
  * @brief A Simple Net Library
- * @details
- *      This module covers business ReactorTCPServer & ReactorTCPConnect.
- *      Low-level SocketTCP implementation.
- *      And common non-network utilities including print, StringView, Logger ...
+ * @details This module covers:
+ *      business-layer           : ReactorTCPServer & ReactorTCPConnect
+ *      Low-level                : SocketTCP & SocketUDP
+ *      Common non-net utilities : println, StringView, Logger ...
  * 
  * @version 0.1.2
  * @author qinmoM
