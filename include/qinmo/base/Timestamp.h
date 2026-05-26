@@ -1,8 +1,8 @@
 #pragma once
 
 #include "detail/Operator.h"
-
 #include <string>
+#include <stdint.h>
 
 /// @namespace qinmo
 namespace qinmo
@@ -12,7 +12,7 @@ class Timestamp : public qinmo::detail::comp_less<Timestamp>,
                   public qinmo::detail::comp_equal<Timestamp>
 {
 public:
-    using micro = long long;
+    using micro = int64_t;
 
     /// @brief construct with 0
     Timestamp();
@@ -44,5 +44,8 @@ private:
 
 bool operator<(const qinmo::Timestamp &a, const qinmo::Timestamp &b);
 bool operator==(const qinmo::Timestamp &a, const qinmo::Timestamp &b);
+
+Timestamp operator+(const qinmo::Timestamp &a, int64_t b);
+Timestamp operator-(const qinmo::Timestamp &a, int64_t b);
 
 } // namespace qinmo

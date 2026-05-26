@@ -61,14 +61,24 @@ Timestamp Timestamp::now()
         std::chrono::system_clock::now().time_since_epoch()).count());
 }
 
-bool operator<(const Timestamp &a, const Timestamp &b)
+bool operator<(const Timestamp& a, const Timestamp& b)
 {
     return a.getMicroseconds() < b.getMicroseconds();
 }
 
-bool operator==(const Timestamp &a, const Timestamp &b)
+bool operator==(const Timestamp& a, const Timestamp& b)
 {
     return a.getMicroseconds() == b.getMicroseconds();
+}
+
+Timestamp operator+(const qinmo::Timestamp &a, int64_t b)
+{
+    return Timestamp(a.getMicroseconds() + b);
+}
+
+Timestamp operator-(const qinmo::Timestamp &a, int64_t b)
+{
+    return Timestamp(a.getMicroseconds() - b);
 }
 
 } // namespace qinmo
