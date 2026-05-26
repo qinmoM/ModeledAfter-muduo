@@ -2,6 +2,7 @@
 
 #include "../base/Timestamp.h"
 #include <functional>
+#include <atomic>
 
 namespace qinmo
 {
@@ -26,7 +27,7 @@ public:
     void reset();
 
 private:
-    static std::atomic<uint64_t> s_currSeq_;
+    static std::atomic<uint64_t> s_currSeq;
 
     TimerFunc func_;
     qinmo::Timestamp time_;
