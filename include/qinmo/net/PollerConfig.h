@@ -34,9 +34,9 @@
 
     using EventsType = uint32_t;
 
-    static constexpr EventsType NoneEvent = 0;
-    static constexpr EventsType ReadEvent = EPOLLIN | EPOLLPRI;
-    static constexpr EventsType WriteEvent = EPOLLOUT;
+    static constexpr EventsType kNoneEvent = 0;
+    static constexpr EventsType kReadEvent = EPOLLIN | EPOLLPRI;
+    static constexpr EventsType kWriteEvent = EPOLLOUT;
 
     } // namespace poller
     } // namespace net
@@ -57,9 +57,9 @@
 
     using EventsType = short int;
 
-    static constexpr EventsType NoneEvent = 0;
-    static constexpr EventsType ReadEvent = POLLIN | POLLPRI;
-    static constexpr EventsType WriteEvent = POLLOUT;
+    static constexpr EventsType kNoneEvent = 0;
+    static constexpr EventsType kReadEvent = POLLIN | POLLPRI;
+    static constexpr EventsType kWriteEvent = POLLOUT;
 
     } // namespace poller
     } // namespace net

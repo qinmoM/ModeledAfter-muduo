@@ -6,11 +6,11 @@ namespace qinmo
 namespace detail
 {
 
-thread_local ThreadIDType cached_thread_id = threadIDTypeEmpty;
+thread_local ThreadIDType cached_thread_id = g_ThreadIDTypeEmpty;
 
 ThreadIDType getTid()
 {
-    if (threadIDTypeEmpty == cached_thread_id)
+    if (g_ThreadIDTypeEmpty == cached_thread_id)
         cached_thread_id = tid();
 
     return cached_thread_id;

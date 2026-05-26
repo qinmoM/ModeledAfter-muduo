@@ -75,31 +75,31 @@ void Channel::setErrorEvent(EventCallback ev)
 
 void Channel::enableRead()
 {
-    events_ |= poller::ReadEvent;
+    events_ |= poller::kReadEvent;
     updateInEventLoop();
 }
 
 void Channel::disableRead()
 {
-    events_ &= ~poller::ReadEvent;
+    events_ &= ~poller::kReadEvent;
     updateInEventLoop();
 }
 
 void Channel::enableWrite()
 {
-    events_ |= poller::WriteEvent;
+    events_ |= poller::kWriteEvent;
     updateInEventLoop();
 }
 
 void Channel::disableWrite()
 {
-    events_ &= ~poller::WriteEvent;
+    events_ &= ~poller::kWriteEvent;
     updateInEventLoop();
 }
 
 void Channel::disableAll()
 {
-    events_ = poller::NoneEvent;
+    events_ = poller::kNoneEvent;
     updateInEventLoop();
 }
 
@@ -110,12 +110,12 @@ bool Channel::isNone() const
 
 bool Channel::isRead() const
 {
-    return events_ & poller::ReadEvent;
+    return events_ & poller::kReadEvent;
 }
 
 bool Channel::isWrite() const
 {
-    return events_ & poller::WriteEvent;
+    return events_ & poller::kWriteEvent;
 }
 
 bool Channel::isAll() const

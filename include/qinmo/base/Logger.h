@@ -11,9 +11,9 @@ namespace qinmo
 
 /// @note the written file
 #ifdef QINMO_LOG_PATH
-constexpr const char* loggerPath = QINMO_LOG_PATH;
+constexpr const char* kLoggerPath = QINMO_LOG_PATH;
 #else
-constexpr const char* loggerPath = "logs.log";
+constexpr const char* kLoggerPath = "logs.log";
 #endif
 
 /// @note
@@ -86,7 +86,7 @@ public:
 
 private:
     Logger()
-        : ofs_(loggerPath, std::ios::app)
+        : ofs_(kLoggerPath, std::ios::app)
         , lastTime_(Timestamp::now())
         , count_(0)
     {

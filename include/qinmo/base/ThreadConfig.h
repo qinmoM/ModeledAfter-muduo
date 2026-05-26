@@ -12,7 +12,7 @@ namespace detail
 #ifdef __linux__
     using ThreadIDType = pid_t;
 
-    static constexpr ThreadIDType threadIDTypeEmpty = 0;
+    static constexpr ThreadIDType g_ThreadIDTypeEmpty = 0;
 #else
     #error "Platform not supported"
 #endif

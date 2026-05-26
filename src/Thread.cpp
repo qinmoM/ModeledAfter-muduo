@@ -7,7 +7,7 @@ Thread::Thread(ThreadFunc func)
     : func_(std::move(func))
     , started_(false)
     , joined_(false)
-    , id_(qinmo::detail::threadIDTypeEmpty)
+    , id_(qinmo::detail::g_ThreadIDTypeEmpty)
 {
     if (!func_)
     {
@@ -58,7 +58,7 @@ void Thread::start()
     );
 
     std::unique_lock<std::mutex> lock(mutex_);
-    cv_.wait(lock, [this]() -> bool { return qinmo::detail::threadIDTypeEmpty != id_; });
+    cv_.wait(lock, [this]() -> bool { return qinmo::detail::g_ThreadIDTypeEmpty != id_; });
 }
 
 void Thread::join()
