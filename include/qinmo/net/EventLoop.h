@@ -48,6 +48,7 @@ public:
     TimerID timerAfter(double seconds, TimerFunc func);
     TimerID timerRepeatAt(Timestamp timestamp, double intervalSeconds, TimerFunc func);
     TimerID timerRepeatAfter(double beginSeconds, double intervalSeconds, TimerFunc func);
+    void timerCancel(TimerID id);
 
     bool isInCurrentThread() const;
 
