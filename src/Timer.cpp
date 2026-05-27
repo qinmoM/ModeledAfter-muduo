@@ -9,7 +9,7 @@ namespace net
 std::atomic<uint64_t> Timer::s_currSeq = 0;
 
 Timer::Timer(TimerFunc func, Timestamp when, double intervalSeconds)
-    : func_(func)
+    : func_(std::move(func))
     , time_(when)
     , interval_(intervalSeconds * Timestamp::MicToSec)
     , seq_(++s_currSeq)
