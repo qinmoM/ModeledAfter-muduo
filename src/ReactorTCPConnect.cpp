@@ -83,6 +83,46 @@ void ReactorTcpConnect::connectDestroyed()
     channel_.remove();
 }
 
+TimerID ReactorTcpConnect::timerAt(Timestamp timestamp, TimerConnFunc func)
+{
+    return timerRepeatAt(timestamp, 0.0, std::move(func));
+}
+
+TimerID ReactorTcpConnect::timerAfter(double seconds, TimerConnFunc func)
+{
+    return timerRepeatAt(Timestamp::now() + static_cast<int64_t>(seconds * Timestamp::MicToSec), 0.0, std::move(func));
+}
+
+TimerID ReactorTcpConnect::timerRepeatAt(Timestamp timestamp, double intervalSeconds, TimerConnFunc func)
+{
+    if (!func)
+    {
+        QINMO_WARN("ReactorTcpConnect.timerRepeatAt: func cannot be nullptr. fd=", sock_.getfd());
+        return TimerID();
+    }
+
+    std::weak_ptr<ReactorTcpConnect> weakPtr = shared_from_this();
+    return loop_->timerRepeatAt(
+        timestamp,
+        intervalSeconds,
+        [weakPtr, func]() -> void
+        {
+            RTcpConnPtr p = weakPtr.lock();
+            if (p)
+                func(p);
+        }
+    );
+}
+
+TimerID ReactorTcpConnect::timerRepeatAfter(double beginSeconds, double intervalSeconds, TimerConnFunc func)
+{
+    return timerRepeatAt(Timestamp::now() + static_cast<int64_t>(beginSeconds * Timestamp::MicToSec), intervalSeconds, std::move(func));
+}
+
+void ReactorTcpConnect::timerCancel(TimerID id)
+{
+    return loop_->timerCancel(id);
+}
 
 void ReactorTcpConnect::send(const std::string& str)
 {
