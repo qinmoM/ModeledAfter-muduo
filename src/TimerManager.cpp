@@ -99,15 +99,15 @@ void TimerManager::handleRead(Timestamp time)
             continue;
         }
 
+        uint64_t seqTemp = it->second;
         currTimer_ = timer->second->getSequence();
         timer->second->run();
         currTimer_ = 0;
 
-        uint64_t seqTemp = it->second;
-        timersOrder_.erase(it);
         if (timers_.find(seqTemp) == timers_.end())
             continue;
 
+        timersOrder_.erase(it);
         timer->second->reset();
         if (timer->second->getInterval())
             timersOrder_.insert({ timer->second->getTimestamp(), timer->second->getSequence() });
