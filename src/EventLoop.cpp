@@ -1,5 +1,6 @@
 #include "qinmo/net/EventLoop.h"
 #include "qinmo/net/Poller.h"
+#include "qinmo/base/Logger.h"
 
 namespace qinmo
 {
@@ -13,6 +14,7 @@ EventLoop::EventLoop()
     , timeoutMs_(2000)
     , wakeupfd_(qinmo::detail::eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC))
     , wakeupChannel_(new Channel(this, wakeupfd_))
+    , timerManager_(this)
     , tid_(qinmo::detail::getTid())
     , quit_(false)
     , looping_(false)
@@ -108,6 +110,37 @@ void EventLoop::queueInLoop(Functor func)
 
     if (!isInCurrentThread() || pending_)
         wakeup();
+}
+
+TimerID EventLoop::timerAt(Timestamp timestamp, TimerFunc func)
+{
+    return timerManager_.addEvent(std::move(func), timestamp, 0.0);
+}
+
+TimerID EventLoop::timerAfter(double seconds, TimerFunc func)
+{
+    return timerManager_.addEvent(std::move(func), Timestamp::now() + static_cast<int64_t>(seconds * Timestamp::MicToSec), 0.0);
+}
+
+TimerID EventLoop::timerRepeatAt(Timestamp timestamp, double intervalSeconds, TimerFunc func)
+{
+    if (intervalSeconds <= 0.0)
+    {
+        QINMO_ERROR("EventLoop.timerRepeat..:The interval cannot be negative. interval:", intervalSeconds);
+        intervalSeconds = 0.0;
+    }
+
+    return timerManager_.addEvent(std::move(func), timestamp, intervalSeconds);
+}
+
+TimerID EventLoop::timerRepeatAfter(double beginSeconds, double intervalSeconds, TimerFunc func)
+{
+    return timerRepeatAt(Timestamp::now() + static_cast<int64_t>(beginSeconds * Timestamp::MicToSec), intervalSeconds, std::move(func));
+}
+
+void EventLoop::timerCancel(TimerID id)
+{
+    return timerManager_.cancelEvent(id);
 }
 
 bool EventLoop::isInCurrentThread() const
