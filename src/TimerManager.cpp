@@ -14,7 +14,7 @@ TimerManager::TimerManager(EventLoop* loop)
     , fd_(qinmo::detail::timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK | TFD_CLOEXEC))
     , channel_(loop_, fd_)
     , currTimer_(0)
-    , cancelTimer_(0)
+    , cancelTimer_()
 {
     if (0 > fd_)
     {
@@ -42,7 +42,7 @@ TimerID TimerManager::addEvent(TimerFunc func, Timestamp when, double interval)
         {
             std::unique_ptr<Timer> timerPtr(tPtr);
 
-            if (timersOrder_.empty() || timersOrder_.begin()->first > timerPtr->getTimestamp())
+            if (0 == currTimer_ && (timersOrder_.empty() || timersOrder_.begin()->first > timerPtr->getTimestamp()))
                 resetTimerfd(timerPtr->getTimestamp());
 
             timersOrder_.insert({ timerPtr->getTimestamp(), timerPtr->getSequence() });

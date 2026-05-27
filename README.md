@@ -31,9 +31,6 @@ mkdir build && cd build
 cmake .. # -DQINMO_LOG_PATH="log output path" -DQINMO_LOG_LEVEL=0~5 # output level: 0:trace - 5:fatal
 make
 ```
-How to get the code:  
-### Method 1:  
-────If you want to compile this library, views follow the steps:  
 If your project structure as follows:  
 ```
 project/
@@ -42,8 +39,11 @@ project/
 ├── src/
 └── CMakeLists.txt
 ```
-You can `cd` into `external/` folder and run `git clone -b main --single-branch https://github.com/qinmoM/qinmo_net` to clone this repository, or download and unpack the a version from release.  
-Then add the following lines to the end of your *CMakeLists.txt*:  
+How to get the code:  
+### Method 1:  
+────If you want to compile this library, views follow the steps:  
+- You can `cd` into `external/` folder and run `git clone -b main --single-branch https://github.com/qinmoM/qinmo_net` to clone this repository, or download and unpack the a version from release.  
+- Then add the following lines to the end of your *CMakeLists.txt*:  
 ```cmake
 add_subdirectory(external/qinmo_net)
 
