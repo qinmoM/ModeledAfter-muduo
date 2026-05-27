@@ -4,6 +4,7 @@
 #include "EventLoopThreadPool.h"
 #include "PacketBuffer.h"
 #include "Channel.h"
+#include "TimerManager.h"
 
 /// @namespace qinmo
 namespace qinmo

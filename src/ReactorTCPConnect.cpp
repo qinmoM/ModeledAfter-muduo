@@ -41,6 +41,11 @@ int ReactorTcpConnect::getfd() const
     return sock_.getfd();
 }
 
+bool ReactorTcpConnect::getIsConnect() const
+{
+    return state_ == RTcpConnState::Connected;
+}
+
 EventLoop* ReactorTcpConnect::getLoop() const
 {
     return loop_;
