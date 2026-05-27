@@ -65,11 +65,11 @@ void TimerManager::cancelEvent(TimerID id)
             uint64_t s = timersOrder_.begin()->second;
             timersOrder_.erase(TimerEntry{ it->second->getTimestamp(), id.seq_ });
             if (id.seq_ == currTimer_)
-                cancelTimer_ = id.seq_;
-            else
-                timers_.erase(it);
+                cancelTimer_.emplace_back(std::move(it->second));
 
-            if (s != timersOrder_.begin()->second)
+            timers_.erase(it);
+
+            if (0 == currTimer_ && !timersOrder_.empty() && s != timersOrder_.begin()->second)
                 resetTimerfd(timersOrder_.begin()->first);
         }
     );
@@ -91,9 +91,6 @@ void TimerManager::handleRead(Timestamp time)
         if (it->first > time)
             break;
 
-        timers_.erase(cancelTimer_);
-        cancelTimer_ = 0;
-
         auto timer = timers_.find(it->second);
         if (timer == timers_.end())
         {
@@ -106,7 +103,11 @@ void TimerManager::handleRead(Timestamp time)
         timer->second->run();
         currTimer_ = 0;
 
+        uint64_t seqTemp = it->second;
         timersOrder_.erase(it);
+        if (timers_.find(seqTemp) == timers_.end())
+            continue;
+
         timer->second->reset();
         if (timer->second->getInterval())
             timersOrder_.insert({ timer->second->getTimestamp(), timer->second->getSequence() });
@@ -114,8 +115,7 @@ void TimerManager::handleRead(Timestamp time)
             timers_.erase(timer);
     }
 
-    timers_.erase(cancelTimer_);
-    cancelTimer_ = 0;
+    cancelTimer_.clear();
     if (!timersOrder_.empty())
         resetTimerfd(timersOrder_.begin()->first);
 }

@@ -42,9 +42,12 @@ private:
     Channel channel_;
 
     std::unordered_map<uint64_t, std::unique_ptr<Timer>> timers_;
+    // for order
     std::set<TimerEntry> timersOrder_;
+
+    // for cancel
+    std::vector<std::unique_ptr<Timer>> cancelTimer_;
     uint64_t currTimer_;
-    uint64_t cancelTimer_;
 
 };
 } // namespace net
