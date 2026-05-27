@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <sys/syscall.h>
 #include <sys/eventfd.h>
+#include <sys/timerfd.h>
 
 /// @namespace qinmo
 namespace qinmo
@@ -25,6 +26,15 @@ inline int eventfd(unsigned int initval, int flags) { return ::eventfd(initval, 
                 syscall
 */
 inline long tid() { return ::syscall(SYS_gettid); }
+
+/*
+                timerfd
+*/
+/// @param clockid CLOCK_MONOTONIC : only increases from 0  |  CLOCK_REALTIME : system time, affected when modify time
+/// @param flags TFD_NONBLOCK : nonblock  |  TFD_CLOEXEC : auto close when sub process
+inline int timerfd_create(int clockid, int flags) { return ::timerfd_create(clockid, flags); }
+/// @param flags 0 : relative time  |  TFD_TIMER_ABSTIME : absolute time
+inline int timerfd_settime(int fd, int flags, const itimerspec* newVal, itimerspec* oldVal) { return ::timerfd_settime(fd, flags, newVal, oldVal); }
 
 } // namespace detail
 } // namespace qinmo
