@@ -19,6 +19,8 @@ class ReactorTcpConnect;
 using RTcpConnPtr = std::shared_ptr<ReactorTcpConnect>;
 
 /// @brief connecting callback
+using TimerConnFunc = std::function<void(const RTcpConnPtr&)>;
+/// @brief connecting callback
 using ConnectFunc = std::function<void(const RTcpConnPtr&)>;
 /// @brief disconnection callback
 using DisconnectFunc = std::function<void(const RTcpConnPtr&)>;
@@ -51,12 +53,19 @@ public:
 
 public:
     int getfd() const;
+    bool getIsConnect() const;
     EventLoop* getLoop() const;
     InetAddr getLocalAddr() const;
     InetAddr getPeerAddr() const;
 
     void connectEstablished();
     void connectDestroyed();
+
+    TimerID timerAt(Timestamp timestamp, TimerConnFunc func);
+    TimerID timerAfter(double seconds, TimerConnFunc func);
+    TimerID timerRepeatAt(Timestamp timestamp, double intervalSeconds, TimerConnFunc func);
+    TimerID timerRepeatAfter(double beginSeconds, double intervalSeconds, TimerConnFunc func);
+    void timerCancel(TimerID id);
 
     void send(const std::string& str);
     void send(PacketBuffer& buf);
