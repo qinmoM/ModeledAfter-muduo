@@ -50,7 +50,7 @@ std::string Timestamp::toStringMicroseconds(bool local) const
     int len = std::strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", &tm);
 
     if (0 == len) return "";
-    len += std::snprintf(buf + len, sizeof(buf) - len, ".%06lld", getMicroseconds() % MicToSec);
+    len += std::snprintf(buf + len, sizeof(buf) - len, ".%06ld", getMicroseconds() % MicToSec);
 
     return std::string(buf, len);
 }
