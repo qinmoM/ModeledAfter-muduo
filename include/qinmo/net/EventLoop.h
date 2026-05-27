@@ -2,6 +2,7 @@
 
 #include "Channel.h"
 #include "qinmo/base/ThreadConfig.h"
+#include "TimerManager.h"
 #include <mutex>
 
 namespace qinmo
@@ -43,6 +44,11 @@ public:
     void runInLoop(Functor func);
     void queueInLoop(Functor func);
 
+    TimerID timerAt(Timestamp timestamp, TimerFunc func);
+    TimerID timerAfter(double seconds, TimerFunc func);
+    TimerID timerRepeatAt(Timestamp timestamp, double intervalSeconds, TimerFunc func);
+    TimerID timerRepeatAfter(double beginSeconds, double intervalSeconds, TimerFunc func);
+
     bool isInCurrentThread() const;
 
 private:
@@ -55,6 +61,8 @@ private:
 
     int wakeupfd_;
     std::unique_ptr<Channel> wakeupChannel_;
+
+    TimerManager timerManager_;
 
     ChannelList activeChannels_;
 
