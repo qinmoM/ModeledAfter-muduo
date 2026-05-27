@@ -91,31 +91,33 @@ void TimerManager::handleRead(Timestamp time)
         if (it->first > time)
             break;
 
-        ;
+        timers_.erase(cancelTimer_);
+        cancelTimer_ = 0;
+
+        auto timer = timers_.find(it->second);
+        if (timer == timers_.end())
+        {
+            QINMO_ERROR("Failed to find timer from timersOrder in timers. tfd=", fd_, ", sequence=", it->second);
+            timersOrder_.erase(it);
+            continue;
+        }
+
+        currTimer_ = timer->second->getSequence();
+        timer->second->run();
+        currTimer_ = 0;
+
+        timersOrder_.erase(it);
+        timer->second->reset();
+        if (timer->second->getInterval())
+            timersOrder_.insert({ timer->second->getTimestamp(), timer->second->getSequence() });
+        else
+            timers_.erase(timer);
     }
 
-    // for (const auto& it : timersOrder_)
-    // {
-    //     timers_.erase(cancelTimer_);
-    //     cancelTimer_ = 0;
-
-    //     if (time < it.first)
-    //         return;
-
-    //     auto timer = timers_.find(it.second);
-    //     if (timer == timers_.end())
-    //     {
-    //         QINMO_ERROR("Failed to find timer from timersOrder in timers. tfd=", fd_, ", sequence=", it.second);
-    //         return;
-    //     }
-
-    //     currTimer_ = it.second;
-    //     timer->second->run();
-    //     currTimer_ = 0;
-    // }
-
-    // timers_.erase(cancelTimer_);
-    // cancelTimer_ = 0;
+    timers_.erase(cancelTimer_);
+    cancelTimer_ = 0;
+    if (!timersOrder_.empty())
+        resetTimerfd(timersOrder_.begin()->first);
 }
 
 void TimerManager::resetTimerfd(Timestamp when)

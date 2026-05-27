@@ -43,7 +43,8 @@ private:
 
     std::unordered_map<uint64_t, std::unique_ptr<Timer>> timers_;
     std::set<TimerEntry> timersOrder_;
-    std::set<uint64_t> timersCancel_;
+    uint64_t currTimer_;
+    uint64_t cancelTimer_;
 
 };
 } // namespace net
