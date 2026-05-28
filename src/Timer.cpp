@@ -1,4 +1,5 @@
 #include "qinmo/net/Timer.h"
+#include "qinmo/base/Logger.h"
 
 namespace qinmo
 {
@@ -13,9 +14,14 @@ Timer::Timer(TimerFunc func, Timestamp when, double intervalSeconds)
     , time_(when)
     , interval_(intervalSeconds * Timestamp::MicToSec)
     , seq_(++s_currSeq)
-{ }
+{
+    QINMO_TRACE("Timer create. seq=", seq_);
+}
 
-Timer::~Timer() { }
+Timer::~Timer()
+{
+    QINMO_TRACE("Timer destroy. seq=", seq_);
+}
 
 uint64_t Timer::getSequence() const
 {
