@@ -1,4 +1,4 @@
-#include "qinmo/base/Thread.h"
+#include "qinmo/base/Logger.h"
 
 namespace qinmo
 {
@@ -11,7 +11,8 @@ Thread::Thread(ThreadFunc func)
 {
     if (!func_)
     {
-        // logger :  "Thread.func_ must is not nullptr";
+        QINMO_FATAL("Thread.func_ must is not nullptr.");
+        std::terminate();
     }
 }
 
