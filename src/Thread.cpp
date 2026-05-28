@@ -12,7 +12,8 @@ Thread::Thread(ThreadFunc func)
     if (!func_)
     {
         QINMO_FATAL("Thread.func_ must is not nullptr.");
-        std::terminate();
+        std::cout << "Thread.func_ must is not nullptr." << std::endl;
+        std::exit(-1);
     }
 }
 

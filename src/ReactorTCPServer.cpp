@@ -21,7 +21,7 @@ ReactorTcpServer::ReactorTcpServer(EventLoop* loop, const InetAddr& listenAddr, 
     if (!sock_.isValid())
     {
         QINMO_FATAL("Failed to create socket with nonblockOrDie.");
-        std::terminate();
+        std::exit(-1);
     }
 
     if (!sock_.setReuseAddr(true))
@@ -32,7 +32,7 @@ ReactorTcpServer::ReactorTcpServer(EventLoop* loop, const InetAddr& listenAddr, 
     if (!sock_.bind(listenAddr))
     {
         QINMO_FATAL("Failed to bind.");
-        std::terminate();
+        std::exit(-1);
     }
 
     acceptChannel_.setReadEvent( [this](Timestamp stamp) -> void { newConnect(stamp); } );
@@ -86,7 +86,7 @@ void ReactorTcpServer::start(EventLoopThread::EventLoopThreadInitFunc func)
             if (!sock_.listen())
             {
                 QINMO_FATAL("Failed to listen.");
-                std::terminate();
+                std::exit(-1);
             }
             acceptChannel_.enableRead();
         }

@@ -19,7 +19,7 @@ TimerManager::TimerManager(EventLoop* loop)
     if (0 > fd_)
     {
         QINMO_FATAL("TimerManager: Failed to create timerfd.");
-        std::terminate();
+        std::exit(-1);
     }
 
     channel_.setReadEvent( [this](qinmo::Timestamp time) -> void { handleRead(time); } );

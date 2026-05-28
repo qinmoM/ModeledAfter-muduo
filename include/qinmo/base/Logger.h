@@ -1,3 +1,6 @@
+/**
+ * @note Perfer 'exit' over 'terminater', otherwise logs maybe not write into file
+ */
 #pragma once
 
 #include "StringConcat.h"
