@@ -5,6 +5,7 @@
 #include "PacketBuffer.h"
 #include "Channel.h"
 #include "TimerID.h"
+#include <set>
 
 /// @namespace qinmo
 namespace qinmo
@@ -118,6 +119,8 @@ private:
 
     PacketBuffer inputBuffer_;
     PacketBuffer outputBuffer_;
+
+    std::set<TimerID> timers_;
 
 };
 

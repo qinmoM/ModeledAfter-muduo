@@ -20,6 +20,11 @@ public:
     TimerID(TimerID&&) = default;
     TimerID& operator=(TimerID&&) = default;
 
+    bool operator<(const TimerID& b) const
+    {
+        return seq_ < b.seq_;
+    }
+
 private:
     TimerID(uint64_t seq) : seq_(seq) { }
 
