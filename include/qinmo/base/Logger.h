@@ -2,9 +2,9 @@
 
 #include "StringConcat.h"
 #include "Timestamp.h"
-#include "ThreadConfig.h"
+#include "Thread.h"
 #include <fstream>
-#include <mutex>
+#include <queue>
 
 namespace qinmo
 {
@@ -66,45 +66,78 @@ public:
         std::string str = qinmo::concat('[', time.toStringMicroseconds(), "] [TID:", qinmo::detail::getTid32(), "] ", args..., '\n');
 
         std::lock_guard<std::mutex> lock(mutex_);
-
-        ofs_ << str;
-        ++count_;
-        if (0 == count_ % 128 || time.getSeconds() - lastTime_.getSeconds() >= 2)
-        {
-            lastTime_ = time;
-            count_ = 0;
-            ofs_.flush();
-        }
+        queue_.push(std::move(str));
+        if (queue_.size() >= 1024)
+            cv_.notify_one();
     }
 
     /// @brief flush buffer
     void flush()
     {
-        std::lock_guard<std::mutex> lock(mutex_);
-        ofs_.flush();
+        {
+            std::lock_guard<std::mutex> lock(mutex_);
+            needtoFlush_ = true;
+        }
+        cv_.notify_one();
     }
 
 private:
+    void threadWorkFunc()
+    {
+        while (true)
+        {
+            std::unique_lock<std::mutex> lock(mutex_);
+            cv_.wait_for(lock, std::chrono::seconds(1), [this]() -> bool { return 1024 <= queue_.size() || !running_ || needtoFlush_; });
+
+            if (!running_ && queue_.empty())
+                break;
+
+            needtoFlush_ = false;
+            std::queue<std::string> temp;
+            std::swap(temp, queue_);
+            lock.unlock();
+
+            while (!temp.empty())
+            {
+                ofs_ << temp.front();
+                temp.pop();
+            }
+
+            ofs_.flush();
+        }
+    }
+
     Logger()
         : ofs_(kLoggerPath, std::ios::app)
-        , lastTime_(Timestamp::now())
-        , count_(0)
+        , thread_([this]() -> void { threadWorkFunc(); })
+        , running_(true)
+        , needtoFlush_(false)
     {
         ofs_ << '\n';
+        thread_.start();
     }
 
     ~Logger()
     {
-        std::lock_guard<std::mutex> lock(mutex_);
+        {
+            std::lock_guard<std::mutex> lock(mutex_);
+            running_ = false;
+        }
+
+        cv_.notify_one();
+        thread_.join();
         ofs_.flush();
         ofs_.close();
     }
 
 private:
     std::ofstream ofs_;
+    Thread thread_;
+    std::queue<std::string> queue_;
     std::mutex mutex_;
-    Timestamp lastTime_;
-    unsigned int count_;
+    std::condition_variable cv_;
+    bool needtoFlush_;
+    bool running_;
 
 };
 
