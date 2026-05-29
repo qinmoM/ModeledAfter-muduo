@@ -4,6 +4,7 @@
 #include <sys/syscall.h>
 #include <sys/eventfd.h>
 #include <sys/timerfd.h>
+#include <string.h>
 
 /// @namespace qinmo
 namespace qinmo

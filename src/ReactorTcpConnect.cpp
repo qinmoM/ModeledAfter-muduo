@@ -310,9 +310,16 @@ void ReactorTcpConnect::handleRead(Timestamp time)
     ssize_t len = inputBuffer_.readFd(sock_.getfd(), save);
 
     if (0 > len)
+    {
+        if (EAGAIN == errno || EWOULDBLOCK == errno || EINTR == errno)
+            return;
+
         handleError();
+    }
     else if (0 == len)
+    {
         handleClose();
+    }
     else
     {
         if (messageFunc_)
@@ -378,7 +385,14 @@ void ReactorTcpConnect::handleError()
     if (detail::getSockOpt(sock_.getfd(), SOL_SOCKET, SO_ERROR, &opt, optLen) < 0)
         QINMO_ERROR("fd:", sock_.getfd(), " handleError, and getsockopt() error. errno code:", errno, ":", qinmo::detail::strerror(errno));
     else
-        QINMO_ERROR("fd:", sock_.getfd(), " handleError. errno code:", opt, ":", qinmo::detail::strerror(opt));
+    {
+        if (ECONNRESET == opt || EPIPE == opt)
+            QINMO_WARN("fd:", sock_.getfd(), " handleError. errno code:", opt, ":", qinmo::detail::strerror(opt));
+        else
+            QINMO_ERROR("fd:", sock_.getfd(), " handleError. errno code:", opt, ":", qinmo::detail::strerror(opt));
+    }
+
+    handleClose();
 }
 
 } // namespace net
