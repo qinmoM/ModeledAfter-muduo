@@ -126,7 +126,7 @@ bool Channel::isAll() const
 void Channel::handle(Timestamp timestamp)
 {
     auto guard = tie_.lock();
-    if (tied_ && nullptr == guard)
+    if (tied_ && !guard)
         return;
 
     isInLoop_.store(true);

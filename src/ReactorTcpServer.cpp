@@ -109,6 +109,7 @@ void ReactorTcpServer::newConnect(Timestamp time)
     if (!localAddr.isValid())
         QINMO_ERROR("Falied to get TcpServer address. lfd=", sock_.getfd(), ", cfd=", cli.getfd());
 
+    int tempfd = cli.getfd();
     RTcpConnPtr conn =
         std::make_shared<ReactorTcpConnect>(
             subLoop,
@@ -116,12 +117,22 @@ void ReactorTcpServer::newConnect(Timestamp time)
             localAddr,
             peerAddr
         );
-    rConnects_[cli.getfd()] = conn;
+
+    rConnects_[tempfd] = conn;
     conn->setConnectFunc(connect_);
     conn->setDisconnectFunc(disconnect_);
     conn->setMessageFunc(message_);
     conn->setWriteCompleteFunc(writeComplete_);
-    conn->setCloseFunc( [this, conn]() -> void { removeConnect(conn); } );
+    std::weak_ptr<ReactorTcpConnect> weakConn = conn;
+    conn->setCloseFunc(
+        [this, weakConn]() -> void
+        {
+            RTcpConnPtr conn = weakConn.lock();
+            QINMO_DEBUG(conn.use_count());
+            if (conn)
+                removeConnect(conn);
+        }
+    );
 
     subLoop->runInLoop( [this, conn]() -> void { conn->connectEstablished(); } );
 }

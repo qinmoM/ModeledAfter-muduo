@@ -177,11 +177,11 @@ void ReactorTcpConnect::send(const std::string& str)
     int newSize = oldSize + str.size() - currIndex;
     if (highWaterMarkFunc_ && waterMark_ > oldSize && waterMark_ <= newSize)
     {
-        RTcpConnPtr p = shared_from_this();
+        RTcpConnPtr self = shared_from_this();
         loop_->queueInLoop(
-            [p, newSize]() -> void
+            [self, newSize]() -> void
             {
-                p->highWaterMarkFunc_(p, newSize);
+                self->highWaterMarkFunc_(self, newSize);
             }
         );
     }
@@ -365,8 +365,9 @@ void ReactorTcpConnect::handleClose()
     state_ = RTcpConnState::Disconnected;
     channel_.disableAll();
 
-    RTcpConnPtr self(shared_from_this());
-    if (disconnectFunc_) disconnectFunc_(self);
+    if (disconnectFunc_)
+        disconnectFunc_(shared_from_this());
+
     closeFunc_();
 }
 
