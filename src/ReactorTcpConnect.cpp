@@ -376,9 +376,9 @@ void ReactorTcpConnect::handleError()
     int opt = 0;
     socklen_t optLen = sizeof(opt);
     if (detail::getSockOpt(sock_.getfd(), SOL_SOCKET, SO_ERROR, &opt, optLen) < 0)
-        QINMO_ERROR("fd:", sock_.getfd(), " handleError, and getsockopt() error. errno code:", errno);
+        QINMO_ERROR("fd:", sock_.getfd(), " handleError, and getsockopt() error. errno code:", errno, ":", qinmo::detail::strerror(errno));
     else
-        QINMO_ERROR("fd:", sock_.getfd(), " handleError. errno code:", opt);
+        QINMO_ERROR("fd:", sock_.getfd(), " handleError. errno code:", opt, ":", qinmo::detail::strerror(opt));
 }
 
 } // namespace net
